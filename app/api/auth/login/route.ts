@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { cookies } from "next/headers";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.log("API error", error);
     return NextResponse.json(
       { message: "Invalid request body" },
@@ -82,8 +81,8 @@ export async function POST(request: NextRequest) {
       path: "/",
     });
     return response;
-  } catch (error: any) {
-    console.error("Login API route error:", error.message);
+  } catch (error: unknown) {
+    console.error("Login API route error:", error instanceof Error ? error.message : String(error));
     // Avoid leaking detailed error messages unless intended
     return NextResponse.json(
       { message: "An internal server error occurred during login." },

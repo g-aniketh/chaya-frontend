@@ -1,30 +1,36 @@
+// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log("Hitting middleware");
-  // Get token from cookie
-  const token = request.cookies.get("token")?.value;
-  console.log(token);
-  // Protected routes pattern
+  console.log("Hitting middleware for path:", pathname);
+
+  // Get token from cookie (use the new cookie name)
+  const token = request.cookies.get("app_session_token")?.value;
+  console.log(
+    "Token from app_session_token cookie:",
+    token ? "Present" : "Absent",
+  );
+
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/farmers") ||
     pathname.startsWith("/staff");
 
-  // Auth routes pattern
   const isAuthRoute = pathname === "/login";
 
-  // Redirect to login if accessing protected route without token
   if (isProtectedRoute && !token) {
-    console.log("Not so sneaky buddy");
+    console.log(
+      "Middleware: No app_session_token, redirecting to /login from protected route",
+    );
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect to dashboard if accessing auth route with token
   if (isAuthRoute && token) {
-    console.log("Proceed");
+    console.log(
+      "Middleware: app_session_token present, redirecting to /dashboard from auth route",
+    );
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -34,8 +40,3 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
-/**
-     *  This middleware checks if the user is accessing a protected route without a token and redirects them to the login page. It also checks if the user is accessing an auth route with a token and redirects them to the dashboard.
-    To apply the middleware to all routes, update the  next.config.js  file:
-     *
-     *  */

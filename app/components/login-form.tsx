@@ -15,7 +15,6 @@ if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
 }
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 type LoginFormProps = Readonly<React.ComponentPropsWithoutRef<"form">>;
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
@@ -32,24 +31,28 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     setError("");
 
     try {
-      const response = await fetch(`${BACKEND_API_URL}api/auth/login`, {
+      // VVVVVV  CALL YOUR NEXT.JS API ROUTE VVVVVV
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include",
+        // `credentials: "include"` is generally not needed when fetching from
+        // the same domain (your Next.js frontend to your Next.js API route).
+        // The browser handles cookies automatically for same-domain requests.
       });
 
+      const data = await response.json(); // Always try to parse JSON
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message ?? "Invalid credentials");
       }
 
-      const data = await response.json();
-      console.log(data);
-      setUser(data.user);
-      console.log("Data set");
+      // `data` should now be { user: { ... } } from your Next.js API route
+      console.log("Data from Next.js API route:", data);
+      setUser(data.user); // Update AuthContext
+      console.log("User data set in AuthContext");
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -57,6 +60,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       } else {
         setError("An error occurred during login");
       }
+      console.error("Login form error:", err);
     } finally {
       setIsLoading(false);
     }

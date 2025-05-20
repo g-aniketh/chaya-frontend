@@ -70,6 +70,9 @@
     "typescript": "^5"
   },
   "pnpm": {
-    "overrides": {}
+    "overrides": {},
+    "ignoredBuiltDependencies": [
+      "@fyzanshaik/chaya-prisma-package"
+    ]
   }
 }

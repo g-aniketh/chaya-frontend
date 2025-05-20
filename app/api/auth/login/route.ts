@@ -1,0 +1,93 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { cookies } from "next/headers";
+
+const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!BACKEND_API_URL) {
+  throw new Error(
+    "NEXT_PUBLIC_BACKEND_URL is not defined in environment variables",
+  );
+}
+
+export async function POST(request: NextRequest) {
+  let email, password;
+
+  try {
+    const body = await request.json();
+    email = body.email;
+    password = body.password;
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 },
+      );
+    }
+  } catch (error) {
+    console.log("API error", error);
+    return NextResponse.json(
+      { message: "Invalid request body" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    // 1. Call your actual Fastify backend
+    const backendResponse = await fetch(`${BACKEND_API_URL}api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+      // `credentials: "include"` is NOT needed for this server-to-server call
+      // unless your Fastify backend specifically requires cookies from this proxy,
+      // which is unlikely for a login endpoint.
+    });
+
+    const backendData = await backendResponse.json();
+
+    if (!backendResponse.ok) {
+      // Forward the error from the backend
+      return NextResponse.json(
+        {
+          message:
+            backendData.message || backendData.error || "Authentication failed",
+        },
+        { status: backendResponse.status },
+      );
+    }
+
+    // 2. If backend login is successful, extract user data and the token
+    //    (ensure your Fastify backend now returns the token in the body)
+    const { user, token: backendToken } = backendData;
+
+    if (!user || !backendToken) {
+      console.error(
+        "User data or token missing from backend response:",
+        backendData,
+      );
+      return NextResponse.json(
+        { message: "Invalid response from authentication server" },
+        { status: 500 },
+      );
+    }
+
+    // 3. Set a new HttpOnly cookie for the frontend domain
+    const response = NextResponse.json({ user }, { status: 200 });
+    response.cookies.set("app_session_token", backendToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Login API route error:", error.message);
+    // Avoid leaking detailed error messages unless intended
+    return NextResponse.json(
+      { message: "An internal server error occurred during login." },
+      { status: 500 },
+    );
+  }
+}

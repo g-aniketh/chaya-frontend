@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import axios from "axios";
 import { useFarmerFormStore } from "@/app/stores/farmer-form";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,59 +45,44 @@ export function FarmerForm({
 
   const handleSubmit = async (data: FieldValues) => {
     setIsSubmitting(true);
-    console.log("Submitting data:", JSON.stringify(data, null, 2));
-
     try {
-      const axiosConfig = {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const apiBaseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
-
+      let response;
       if (mode === "add") {
-        console.log("Doing a POST request to add a new farmer");
-        const response = await axios.post(
-          `${apiBaseUrl}api/farmers`,
-          data,
-          axiosConfig
-        );
-        console.log("POST response:", response.data);
-        toast.success("Farmer added successfully");
+        response = await fetch("/api/farmers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
       } else {
-        console.log("Doing a PUT request to update farmer", farmerId);
-        const response = await axios.put(
-          `${apiBaseUrl}api/farmers/${farmerId}`,
-          data,
-          axiosConfig
-        );
-        console.log("PUT response:", response.data);
-        toast.success("Farmer updated successfully");
+        response = await fetch(`/api/farmers/${farmerId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
       }
 
-      const dataChangedEvent = new CustomEvent("farmerDataChanged");
-      document.dispatchEvent(dataChangedEvent);
-      console.log(
-        "Data changed event dispatched after successful form submission"
-      );
+      const result = await response.json();
 
-      onOpenChange(false);
-    } catch (error: unknown) {
-      console.error("Error submitting form:", error);
-      if (axios.isAxiosError(error)) {
-        console.error("Error response:", error.response?.data);
-        if (error.response?.status === 401) {
+      if (!response.ok) {
+        if (response.status === 401) {
           toast.error("Your session has expired. Please log in again.");
         } else {
-          toast.error(
-            `Error: ${error.response?.data?.error ?? error.message ?? "Something went wrong"}`
-          );
+          toast.error(`Error: ${result?.error ?? "Something went wrong"}`);
         }
-      } else {
-        toast.error("Something went wrong");
+        return;
       }
+
+      toast.success(
+        mode === "add"
+          ? "Farmer added successfully"
+          : "Farmer updated successfully"
+      );
+
+      document.dispatchEvent(new CustomEvent("farmerDataChanged"));
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error submitting farmer form:", error);
+      toast.error("Something went wrong");
     } finally {
       setIsSubmitting(false);
     }

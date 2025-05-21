@@ -21,10 +21,10 @@ import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 
 interface FarmerFormProps {
-  mode: "add" | "edit";
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  farmerId?: number;
+  readonly mode: "add" | "edit";
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly farmerId?: number;
 }
 
 export function FarmerForm({
@@ -57,7 +57,7 @@ export function FarmerForm({
       };
 
       const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+        process.env.NEXT_PUBLIC_API_BACKEND_URL ?? "http://localhost:5000";
 
       if (mode === "add") {
         console.log("Doing a POST request to add a new farmer");
@@ -94,7 +94,7 @@ export function FarmerForm({
           toast.error("Your session has expired. Please log in again.");
         } else {
           toast.error(
-            `Error: ${error.response?.data?.error || error.message || "Something went wrong"}`
+            `Error: ${error.response?.data?.error ?? error.message ?? "Something went wrong"}`
           );
         }
       } else {

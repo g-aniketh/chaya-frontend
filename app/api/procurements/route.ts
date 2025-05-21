@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const backendUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+      process.env.NEXT_PUBLIC_API_BACKEND_URL ?? "http://localhost:5000";
 
     const response = await fetch(`${backendUrl}/api/procurements`, {
       method: "POST",
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       const errorData = await response.json();
       return new NextResponse(
         JSON.stringify({
-          error: errorData.error || "Failed to create procurement",
+          error: errorData.error ?? "Failed to create procurement",
         }),
         { status: response.status }
       );

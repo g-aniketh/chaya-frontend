@@ -56,6 +56,7 @@ interface User {
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
+  updatedAt?: string | Date;
 }
 
 export function StaffTable() {
@@ -70,35 +71,20 @@ export function StaffTable() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useAuth();
-  const axiosConfig = useMemo(
-    () => ({
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }),
-    [],
-  );
-
-  const BACKEND_API_URL =
-    process.env.PROD_BACKEND_URL || "http://localhost:5000";
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `${BACKEND_API_URL}/api/users`,
-        axiosConfig,
-      );
+      const response = await axios.get("/api/users");
       setUsers(response.data.users);
       setFilteredUsers(response.data.users);
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error("Failed to fetch staff members");
+      toast.error("Failed to fetch staff members.");
     } finally {
       setIsLoading(false);
     }
-  }, [axiosConfig, BACKEND_API_URL]);
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -131,6 +117,29 @@ export function StaffTable() {
     setIsEditDialogOpen(true);
   };
 
+  // const handleSaveEdit = async (updatedUserData: Partial<User>) => {
+  //   if (!editingUser) return;
+  //   try {
+  //     const response = await axios.put(
+  //       `/api/users/${editingUser.id}`,
+  //       updatedUserData,
+  //     );
+  //     toast.success("Staff member updated successfully.");
+  //     setUsers((prevUsers) =>
+  //       prevUsers.map((u) =>
+  //         u.id === editingUser.id ? { ...u, ...response.data.user } : u,
+  //       ),
+  //     );
+  //     setIsEditDialogOpen(false);
+  //     setEditingUser(null);
+  //   } catch (error: any) {
+  //     console.error("Error updating user:", error);
+  //     toast.error(
+  //       error.response?.data?.message || "Failed to update staff member.",
+  //     );
+  //   }
+  // };
+
   const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
     setIsDeleteDialogOpen(true);
@@ -139,52 +148,48 @@ export function StaffTable() {
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
     try {
-      await axios.delete(
-        `${BACKEND_API_URL}/api/users/${userToDelete.id}`,
-        axiosConfig,
+      await axios.delete(`/api/users/${userToDelete.id}`);
+      toast.success("Staff member deleted successfully.");
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== userToDelete.id),
       );
-      toast.success("Staff member deleted successfully");
-      fetchUsers();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("Error deleting user:", error);
-      toast.error("Failed to delete staff member");
+      toast.error(
+        error.response?.data?.message || "Failed to delete staff member.",
+      );
     } finally {
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
     }
   };
 
-  const toggleUserStatus = async (user: User) => {
+  const toggleUserStatus = async (userToToggle: User) => {
+    const originalUsers = users.map((u) => ({ ...u }));
+
     setUsers((prev) =>
       prev.map((u) =>
-        u.id === user.id ? { ...u, isEnabled: !u.isEnabled } : u,
+        u.id === userToToggle.id ? { ...u, isEnabled: !u.isEnabled } : u,
       ),
     );
-    setFilteredUsers((prev) =>
-      prev.map((u) =>
-        u.id === user.id ? { ...u, isEnabled: !u.isEnabled } : u,
-      ),
-    );
+
     try {
-      await axios.patch(
-        `${BACKEND_API_URL}/api/users/${user.id}/toggle-status`,
-        {},
-        axiosConfig,
+      const response = await axios.patch(
+        `/api/users/${userToToggle.id}/toggle-status`,
       );
-      toast.success("Staff member status updated successfully");
-    } catch (error: unknown) {
+      toast.success("Staff member status updated successfully.");
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u.id === userToToggle.id ? { ...u, ...response.data.user } : u,
+        ),
+      );
+    } catch (error: any) {
       console.error("Error toggling user status:", error);
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, isEnabled: user.isEnabled } : u,
-        ),
+      setUsers(originalUsers);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update staff member status.",
       );
-      setFilteredUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, isEnabled: user.isEnabled } : u,
-        ),
-      );
-      toast.error("Failed to update staff member status");
     }
   };
 

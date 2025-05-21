@@ -18,18 +18,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' 
+          node-version: "20"
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 10.5.2 
+          version: 10.5.2
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Run ESLint
-        run: pnpm run eslint
+        run: pnpm run lint
 
       - name: Build project
-        run: pnpm run build
+        run: npx prisma generate && pnpm run build

@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 export default function StaffManagementPage() {
   return (
     <AuthProvider>
-      <div className="container mx-auto py-6">
-        {/* <h1 className="text-2xl font-bold mb-6">Staff Management</h1> */}
+      <div className="container mx-auto py-1">
         <StaffDashboard />
       </div>
     </AuthProvider>

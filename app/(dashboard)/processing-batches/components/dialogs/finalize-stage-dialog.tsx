@@ -149,7 +149,10 @@ export function FinalizeStageDialog({
           result.error ||
           `Failed to finalize stage. Status: ${response.status}`;
         const errorDetails = result.details
-          ?.map((d: { path: string[]; message: string }) => `${d.path.join(".")}: ${d.message}`)
+          ?.map(
+            (d: { path: string[]; message: string }) =>
+              `${d.path.join(".")}: ${d.message}`
+          )
           .join("; ");
         throw new Error(
           errorDetails ? `${errorMsg} - ${errorDetails}` : errorMsg

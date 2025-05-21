@@ -144,7 +144,10 @@ export function AddDryingDialog({
       onOpenChange(false); // Close current dialog
     } catch (error) {
       console.error("Error adding drying data:", error);
-      const err = error as AxiosError<{ error?: string; details?: Array<{ path: string[]; message: string }> }>;
+      const err = error as AxiosError<{
+        error?: string;
+        details?: Array<{ path: string[]; message: string }>;
+      }>;
       let errorMessage = "Failed to add drying data";
       if (err.response?.data?.error) {
         errorMessage = err.response.data.error;

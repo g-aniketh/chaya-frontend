@@ -4,8 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   console.log("Hitting middleware for path:", pathname);
-
-  // Get token from cookie (use the new cookie name)
+  console.log("Middleware triggered for:", request.nextUrl.pathname);
   const token = request.cookies.get("app_session_token")?.value;
   console.log(
     "Token from app_session_token cookie:",
@@ -37,5 +36,10 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/dashboard/:path*",
+    "/farmers/:path*",
+    "/staff/:path*",
+    "/login",
+  ],
 };

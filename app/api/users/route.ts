@@ -4,7 +4,7 @@ const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function GET(request: NextRequest) {
   const appSessionToken = request.cookies.get("app_session_token")?.value;
-
+  console.log("GET /api/users called");
   if (!appSessionToken) {
     return NextResponse.json(
       { message: "Unauthorized: Missing session token" },

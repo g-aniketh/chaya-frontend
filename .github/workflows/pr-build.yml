@@ -32,4 +32,4 @@ jobs:
         run: pnpm run lint
 
       - name: Build project
-        run: pnpm run build
+        run: npx prisma generate && pnpm run build 

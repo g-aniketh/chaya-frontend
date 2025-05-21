@@ -29,7 +29,7 @@ jobs:
         run: pnpm install
 
       - name: Run ESLint
-        run: pnpm run eslint
+        run: pnpm run lint
 
       - name: Build project
         run: pnpm run build

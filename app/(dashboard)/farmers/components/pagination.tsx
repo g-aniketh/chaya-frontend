@@ -126,7 +126,7 @@ export default function Pagination({ query }: PaginationProps) {
         variant="outline"
         size="icon"
         className={clsx(
-          currentPage >= totalPages && "opacity-50 cursor-not-allowed",
+          currentPage >= totalPages && "opacity-50 cursor-not-allowed"
         )}
         disabled={currentPage >= totalPages}
         asChild={currentPage < totalPages}

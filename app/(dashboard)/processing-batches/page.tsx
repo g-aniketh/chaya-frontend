@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import ProcessingBatchesHeader from './components/processing-batches-header';
-import Search from './components/search';
-import ProcessingBatchesTable from './components/processing-batches-table';
-import Pagination from './components/pagination';
-import Loading from './loading';
-import { ProcessingBatchCacheProvider } from './context/processing-batch-cache-context';
+import { Suspense } from "react";
+import ProcessingBatchesHeader from "./components/processing-batches-header";
+import Search from "./components/search";
+import ProcessingBatchesTable from "./components/processing-batches-table";
+import Pagination from "./components/pagination";
+import Loading from "./loading";
+import { ProcessingBatchCacheProvider } from "./context/processing-batch-cache-context";
 
 interface PageProps {
   searchParams?: Promise<{
@@ -14,11 +14,13 @@ interface PageProps {
   }>;
 }
 
-export default async function ProcessingBatchesPage({ searchParams }: PageProps) {
+export default async function ProcessingBatchesPage({
+  searchParams,
+}: PageProps) {
   const params = await searchParams;
-  const query = params?.query || '';
+  const query = params?.query || "";
   const currentPage = Number(params?.page) || 1;
-  const status = params?.status || '';
+  const status = params?.status || "";
 
   return (
     <ProcessingBatchCacheProvider>
@@ -28,8 +30,15 @@ export default async function ProcessingBatchesPage({ searchParams }: PageProps)
         <div className="flex items-center justify-between gap-2">
           <Search placeholder="Search by Batch Code, Crop..." />
         </div>
-        <Suspense key={query + currentPage.toString() + status} fallback={<Loading />}>
-          <ProcessingBatchesTable query={query} currentPage={currentPage} statusFilter={status} />
+        <Suspense
+          key={query + currentPage.toString() + status}
+          fallback={<Loading />}
+        >
+          <ProcessingBatchesTable
+            query={query}
+            currentPage={currentPage}
+            statusFilter={status}
+          />
           <Pagination query={query} statusFilter={status} />
         </Suspense>
       </div>

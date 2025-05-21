@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import FarmersHeader from './components/farmers-header';
-import Search from './components/search';
-import FarmersTable from './components/farmers-table';
-import Pagination from './components/pagination';
-import Loading from './loading';
-import { FarmersCacheProvider } from './context/farmer-cache-context';
+import { Suspense } from "react";
+import FarmersHeader from "./components/farmers-header";
+import Search from "./components/search";
+import FarmersTable from "./components/farmers-table";
+import Pagination from "./components/pagination";
+import Loading from "./loading";
+import { FarmersCacheProvider } from "./context/farmer-cache-context";
 
 interface PageProps {
   searchParams?: Promise<{
@@ -15,7 +15,7 @@ interface PageProps {
 
 export default async function FarmersPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const query = params?.query || '';
+  const query = params?.query || "";
   const currentPage = Number(params?.page) || 1;
 
   return (
@@ -35,7 +35,13 @@ export default async function FarmersPage({ searchParams }: PageProps) {
   );
 }
 
-async function FarmersTableWithCache({ query, currentPage }: { query: string; currentPage: number }) {
+async function FarmersTableWithCache({
+  query,
+  currentPage,
+}: {
+  query: string;
+  currentPage: number;
+}) {
   return (
     <>
       <FarmersTable query={query} currentPage={currentPage} />

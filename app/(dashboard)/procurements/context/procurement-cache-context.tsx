@@ -1,30 +1,54 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { getProcurements, getProcurementPages } from '../lib/actions';
-import { ProcurementWithRelations } from '../lib/types';
-import { toast } from 'sonner';
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { getProcurements, getProcurementPages } from "../lib/actions";
+import { ProcurementWithRelations } from "../lib/types";
+import { toast } from "sonner";
 
 interface ProcurementsCacheContextType {
   procurements: Record<string, ProcurementWithRelations[]>;
   totalPages: Record<string, number>;
-  fetchProcurements: (page: number, query: string) => Promise<ProcurementWithRelations[]>;
+  fetchProcurements: (
+    page: number,
+    query: string
+  ) => Promise<ProcurementWithRelations[]>;
   fetchTotalPages: (query: string) => Promise<number>;
   clearCache: () => void;
-  prefetchPages: (startPage: number, endPage: number, query: string) => Promise<void>;
-  refreshCurrentPage: (page: number, query: string) => Promise<ProcurementWithRelations[]>;
+  prefetchPages: (
+    startPage: number,
+    endPage: number,
+    query: string
+  ) => Promise<void>;
+  refreshCurrentPage: (
+    page: number,
+    query: string
+  ) => Promise<ProcurementWithRelations[]>;
 }
 
-const ProcurementsCacheContext = createContext<ProcurementsCacheContextType | undefined>(undefined);
+const ProcurementsCacheContext = createContext<
+  ProcurementsCacheContextType | undefined
+>(undefined);
 
-export function ProcurementsCacheProvider({ children }: { children: React.ReactNode }) {
-  const [procurements, setProcurements] = useState<Record<string, ProcurementWithRelations[]>>({});
+export function ProcurementsCacheProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [procurements, setProcurements] = useState<
+    Record<string, ProcurementWithRelations[]>
+  >({});
   const [totalPages, setTotalPages] = useState<Record<string, number>>({});
 
-  const createKey = useCallback((page: number, query: string) => `${query}:${page}`, []);
+  const createKey = useCallback(
+    (page: number, query: string) => `${query}:${page}`,
+    []
+  );
 
   const fetchProcurements = useCallback(
-    async (page: number, query: string): Promise<ProcurementWithRelations[]> => {
+    async (
+      page: number,
+      query: string
+    ): Promise<ProcurementWithRelations[]> => {
       const key = createKey(page, query);
 
       if (procurements[key]) {
@@ -34,14 +58,17 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
 
       console.log(`Fetching page ${page}, query "${query}" from server`);
       try {
-        const data = (await getProcurements({ page, query })) as ProcurementWithRelations[];
-        setProcurements(prev => ({
+        const data = (await getProcurements({
+          page,
+          query,
+        })) as ProcurementWithRelations[];
+        setProcurements((prev) => ({
           ...prev,
           [key]: data,
         }));
         return data;
       } catch (error) {
-        toast.error('Failed to fetch procurements data from server.');
+        toast.error("Failed to fetch procurements data from server.");
         throw error;
       }
     },
@@ -56,13 +83,13 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
 
       try {
         const pages = await getProcurementPages(query);
-        setTotalPages(prev => ({
+        setTotalPages((prev) => ({
           ...prev,
           [query]: pages,
         }));
         return pages;
       } catch (error) {
-        toast.error('Failed to fetch pagination data.');
+        toast.error("Failed to fetch pagination data.");
         throw error;
       }
     },
@@ -71,7 +98,9 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
 
   const prefetchPages = useCallback(
     async (startPage: number, endPage: number, query: string) => {
-      console.log(`Prefetching pages ${startPage}-${endPage} for query "${query}"`);
+      console.log(
+        `Prefetching pages ${startPage}-${endPage} for query "${query}"`
+      );
 
       for (let page = startPage; page <= endPage; page++) {
         const key = createKey(page, query);
@@ -83,7 +112,7 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
             page,
             query,
           })) as ProcurementWithRelations[];
-          setProcurements(prev => ({
+          setProcurements((prev) => ({
             ...prev,
             [key]: data,
           }));
@@ -97,16 +126,21 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
   );
 
   const refreshCurrentPage = useCallback(
-    async (page: number, query: string): Promise<ProcurementWithRelations[]> => {
+    async (
+      page: number,
+      query: string
+    ): Promise<ProcurementWithRelations[]> => {
       const key = createKey(page, query);
 
-      console.log(`Force refreshing page ${page}, query "${query}" from server`);
+      console.log(
+        `Force refreshing page ${page}, query "${query}" from server`
+      );
       try {
         const data = (await getProcurements({
           page,
           query,
         })) as ProcurementWithRelations[];
-        setProcurements(prev => ({
+        setProcurements((prev) => ({
           ...prev,
           [key]: data,
         }));
@@ -124,7 +158,7 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
   const clearCache = useCallback(() => {
     setProcurements({});
     setTotalPages({});
-    toast.success('Cache cleared successfully.');
+    toast.success("Cache cleared successfully.");
   }, []);
 
   const value = {
@@ -137,14 +171,20 @@ export function ProcurementsCacheProvider({ children }: { children: React.ReactN
     refreshCurrentPage,
   };
 
-  return <ProcurementsCacheContext.Provider value={value}>{children}</ProcurementsCacheContext.Provider>;
+  return (
+    <ProcurementsCacheContext.Provider value={value}>
+      {children}
+    </ProcurementsCacheContext.Provider>
+  );
 }
 
 export function useProcurementsCache() {
   const context = useContext(ProcurementsCacheContext);
 
   if (context === undefined) {
-    throw new Error('useProcurementsCache must be used within a ProcurementsCacheProvider');
+    throw new Error(
+      "useProcurementsCache must be used within a ProcurementsCacheProvider"
+    );
   }
 
   return context;

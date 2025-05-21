@@ -3,15 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function POST(request: NextRequest) {
-  const appSessionToken = request.cookies.get("app_session_token")?.value;
+  const token = request.cookies.get("token")?.value;
 
   const response = NextResponse.json(
     { message: "Logged out successfully" },
-    { status: 200 },
+    { status: 200 }
   );
 
   response.cookies.set({
-    name: "app_session_token",
+    name: "token",
     value: "",
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
@@ -20,12 +20,12 @@ export async function POST(request: NextRequest) {
     path: "/",
   });
 
-  if (BACKEND_API_URL && appSessionToken) {
+  if (BACKEND_API_URL && token) {
     try {
       await fetch(`${BACKEND_API_URL}api/auth/logout`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${appSessionToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       console.log("Called backend logout successfully.");
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
   } else {
     console.log(
-      "Skipping backend logout call: BACKEND_API_URL or appSessionToken missing.",
+      "Skipping backend logout call: BACKEND_API_URL or token missing."
     );
   }
 

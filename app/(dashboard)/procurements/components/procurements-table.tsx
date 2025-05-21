@@ -57,7 +57,7 @@ export default function ProcurementsTable({
     useProcurementsCache();
 
   const [procurements, setProcurements] = useState<ProcurementWithRelations[]>(
-    [],
+    []
   );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -94,7 +94,7 @@ export default function ProcurementsTable({
         prefetchPages(
           Math.min(...pagesToPrefetch),
           Math.max(...pagesToPrefetch),
-          query,
+          query
         );
       }
     } catch (error: unknown) {
@@ -188,7 +188,7 @@ export default function ProcurementsTable({
         await handleRefresh();
       } else {
         toast.error(
-          result.error || "Failed to delete procurements. Please try again.",
+          result.error || "Failed to delete procurements. Please try again."
         );
       }
 
@@ -206,7 +206,7 @@ export default function ProcurementsTable({
 
   useEffect(() => {
     const handleViewProcurementEvent = (
-      e: CustomEvent<{ procurement: ProcurementWithRelations }>,
+      e: CustomEvent<{ procurement: ProcurementWithRelations }>
     ) => {
       handleViewDetails(e.detail.procurement);
     };
@@ -216,21 +216,21 @@ export default function ProcurementsTable({
 
     document.addEventListener(
       "viewProcurement",
-      handleViewProcurementEvent as EventListener,
+      handleViewProcurementEvent as EventListener
     );
     document.addEventListener(
       "procurementDataChanged",
-      handleDataChangeEvent as EventListener,
+      handleDataChangeEvent as EventListener
     );
 
     return () => {
       document.removeEventListener(
         "viewProcurement",
-        handleViewProcurementEvent as EventListener,
+        handleViewProcurementEvent as EventListener
       );
       document.removeEventListener(
         "procurementDataChanged",
-        handleDataChangeEvent as EventListener,
+        handleDataChangeEvent as EventListener
       );
     };
   }, [handleRefresh]);
@@ -316,7 +316,7 @@ export default function ProcurementsTable({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   ))}
@@ -341,7 +341,7 @@ export default function ProcurementsTable({
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       ))}

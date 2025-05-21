@@ -224,7 +224,7 @@ export function BasicInfoSection() {
                     field.onChange(
                       e.target.value === ""
                         ? undefined
-                        : parseFloat(e.target.value),
+                        : parseFloat(e.target.value)
                     )
                   }
                 />

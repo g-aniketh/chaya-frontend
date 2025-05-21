@@ -29,7 +29,7 @@ export function ReviewAndSubmitStep() {
 
   const selectedProcsDetails = useMemo(() => {
     return availableProcurements.filter((p) =>
-      selectedProcurementIds.includes(p.id),
+      selectedProcurementIds.includes(p.id)
     );
   }, [availableProcurements, selectedProcurementIds]);
 

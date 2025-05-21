@@ -44,7 +44,7 @@ export function DocumentUploader({
     if (file.type === "application/pdf") {
       if (fileSizeKB > MAX_PDF_SIZE_KB) {
         throw new Error(
-          `PDF file is too large (${fileSizeKB}KB). Please compress to under ${MAX_PDF_SIZE_KB}KB before uploading.`,
+          `PDF file is too large (${fileSizeKB}KB). Please compress to under ${MAX_PDF_SIZE_KB}KB before uploading.`
         );
       }
       return file;
@@ -68,7 +68,7 @@ export function DocumentUploader({
 
       if (compressedSizeKB > MAX_IMAGE_SIZE_KB) {
         throw new Error(
-          `Image could not be compressed enough (${compressedSizeKB}KB). Please use an image editor to reduce to under ${MAX_IMAGE_SIZE_KB}KB.`,
+          `Image could not be compressed enough (${compressedSizeKB}KB). Please use an image editor to reduce to under ${MAX_IMAGE_SIZE_KB}KB.`
         );
       }
 
@@ -78,7 +78,7 @@ export function DocumentUploader({
         throw error;
       }
       throw new Error(
-        `Failed to compress image. Please try a smaller image (under ${MAX_IMAGE_SIZE_KB}KB).`,
+        `Failed to compress image. Please try a smaller image (under ${MAX_IMAGE_SIZE_KB}KB).`
       );
     } finally {
       setIsCompressing(false);
@@ -100,7 +100,7 @@ export function DocumentUploader({
               }
               throw error;
             }
-          }),
+          })
         );
 
         return processedFiles;
@@ -111,7 +111,7 @@ export function DocumentUploader({
         throw new Error("File processing failed");
       }
     },
-    [compressFile],
+    [compressFile]
   );
 
   return (

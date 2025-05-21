@@ -105,7 +105,7 @@ export function RecordSaleDialog({
 
     if (quantityToSell > availableForSaleFromStage) {
       toast.error(
-        `Cannot sell ${quantityToSell}kg. Only ${availableForSaleFromStage.toFixed(2)}kg available from P${processingStage.processingCount}.`,
+        `Cannot sell ${quantityToSell}kg. Only ${availableForSaleFromStage.toFixed(2)}kg available from P${processingStage.processingCount}.`
       );
       setIsSubmitting(false);
       return;
@@ -129,7 +129,7 @@ export function RecordSaleDialog({
     try {
       await axios.post(`/api/sales`, payload, { withCredentials: true });
       toast.success(
-        `Sale of ${payload.quantitySold}kg for Batch ${batchCode} (from P${processingStage.processingCount}) recorded.`,
+        `Sale of ${payload.quantitySold}kg for Batch ${batchCode} (from P${processingStage.processingCount}) recorded.`
       );
       onSuccess(); // This should trigger a refresh in the table
       onOpenChange(false);
@@ -137,7 +137,7 @@ export function RecordSaleDialog({
       console.error("Error recording sale:", error);
       if (error instanceof AxiosError) {
         toast.error(
-          `Error: ${error.response?.data?.error || error.message || "Failed to record sale"}`,
+          `Error: ${error.response?.data?.error || error.message || "Failed to record sale"}`
         );
       } else if (error instanceof Error) {
         toast.error(`Error: ${error.message || "Failed to record sale"}`);
@@ -189,7 +189,7 @@ export function RecordSaleDialog({
                         field.onChange(
                           e.target.value === ""
                             ? undefined
-                            : parseFloat(e.target.value),
+                            : parseFloat(e.target.value)
                         )
                       }
                     />
@@ -212,7 +212,7 @@ export function RecordSaleDialog({
                             variant="outline"
                             className={cn(
                               "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground",
+                              !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (

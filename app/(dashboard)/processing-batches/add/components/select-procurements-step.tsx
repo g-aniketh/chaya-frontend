@@ -118,7 +118,7 @@ export function SelectProcurementsStep() {
     return displayListItems.filter(
       (item) =>
         selectedProcurementIds.includes(item.id) ||
-        (item.isSelectableBasedOnLock && item.matchesSearchTerm),
+        (item.isSelectableBasedOnLock && item.matchesSearchTerm)
     );
   }, [displayListItems, selectedProcurementIds]);
 
@@ -129,7 +129,7 @@ export function SelectProcurementsStep() {
   }, [availableProcurements, selectedProcurementIds]);
 
   const handleToggleSelection = (
-    procurement: ProcurementWithFarmerForStore,
+    procurement: ProcurementWithFarmerForStore
   ) => {
     toggleSelectedProcurement(procurement);
   };

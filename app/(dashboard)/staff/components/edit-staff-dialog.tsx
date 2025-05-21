@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface User {
   id: number;
@@ -32,7 +30,6 @@ interface User {
   role: "ADMIN" | "STAFF";
   isEnabled: boolean;
 }
-const BACKEND_API_URL = process.env.PROD_BACKEND_URL || "http://localhost:5000";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -50,14 +47,14 @@ interface EditStaffDialogProps {
   user: User;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUserUpdated: () => void;
+  onSave: (updatedUserData: Partial<User>) => Promise<void>;
 }
 
 export function EditStaffDialog({
   user,
   open,
   onOpenChange,
-  onUserUpdated,
+  onSave,
 }: EditStaffDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -79,16 +76,10 @@ export function EditStaffDialog({
 
     setIsSubmitting(true);
     try {
-      await axios.put(`${BACKEND_API_URL}/api/users/${user.id}`, updateData);
-      toast.success("Staff member's details updated successfully");
-      onUserUpdated();
+      await onSave(updateData);
       onOpenChange(false);
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to update staff member's details";
-      toast.error(errorMessage);
+    } catch (error) {
+      console.error("Error in EditStaffDialog:", error);
     } finally {
       setIsSubmitting(false);
     }

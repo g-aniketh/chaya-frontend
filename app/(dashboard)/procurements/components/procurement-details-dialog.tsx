@@ -130,7 +130,7 @@ export function ProcurementDetailsDialog({
                   <span>
                     {format(
                       new Date(procurement.createdAt),
-                      "dd/MM/yyyy hh:mm a",
+                      "dd/MM/yyyy hh:mm a"
                     )}
                   </span>
                   <span className="font-medium text-muted-foreground">
@@ -139,7 +139,7 @@ export function ProcurementDetailsDialog({
                   <span>
                     {format(
                       new Date(procurement.updatedAt),
-                      "dd/MM/yyyy hh:mm a",
+                      "dd/MM/yyyy hh:mm a"
                     )}
                   </span>
                 </div>

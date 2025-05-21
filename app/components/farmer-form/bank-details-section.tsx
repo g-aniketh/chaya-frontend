@@ -58,7 +58,7 @@ export function BankDetailsSection() {
         message: "Failed to fetch IFSC details due to a network error.",
       });
       toast.error(
-        "Network error while fetching IFSC details. Please try again later.",
+        "Network error while fetching IFSC details. Please try again later."
       );
     } finally {
       setLoadingIFSC(false);

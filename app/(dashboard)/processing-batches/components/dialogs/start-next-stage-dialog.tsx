@@ -114,7 +114,7 @@ export function StartNextStageDialog({
         withCredentials: true,
       });
       toast.success(
-        `Stage P${nextProcessingCount} for Batch ${batchCode} started successfully.`,
+        `Stage P${nextProcessingCount} for Batch ${batchCode} started successfully.`
       );
       onSuccess();
       onOpenChange(false);
@@ -122,7 +122,7 @@ export function StartNextStageDialog({
       console.error("Error starting next stage:", error);
       if (error instanceof AxiosError) {
         toast.error(
-          `Error: ${error.response?.data?.error || error.message || "Failed to start next stage"}`,
+          `Error: ${error.response?.data?.error || error.message || "Failed to start next stage"}`
         );
       } else if (error instanceof Error) {
         toast.error(`Error: ${error.message || "Failed to start next stage"}`);
@@ -192,7 +192,7 @@ export function StartNextStageDialog({
                           variant="outline"
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (

@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import ProcurementsHeader from './components/procurements-header';
-import Search from './components/search';
-import ProcurementsTable from './components/procurements-table';
-import Pagination from './components/pagination';
-import Loading from './loading';
-import { ProcurementsCacheProvider } from './context/procurement-cache-context';
+import { Suspense } from "react";
+import ProcurementsHeader from "./components/procurements-header";
+import Search from "./components/search";
+import ProcurementsTable from "./components/procurements-table";
+import Pagination from "./components/pagination";
+import Loading from "./loading";
+import { ProcurementsCacheProvider } from "./context/procurement-cache-context";
 
 interface PageProps {
   searchParams?: Promise<{
@@ -15,7 +15,7 @@ interface PageProps {
 
 export default async function ProcurementsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const query = params?.query || '';
+  const query = params?.query || "";
   const currentPage = Number(params?.page) || 1;
 
   return (
@@ -35,7 +35,13 @@ export default async function ProcurementsPage({ searchParams }: PageProps) {
   );
 }
 
-async function ProcurementsTableWithCache({ query, currentPage }: { query: string; currentPage: number }) {
+async function ProcurementsTableWithCache({
+  query,
+  currentPage,
+}: {
+  query: string;
+  currentPage: number;
+}) {
   return (
     <>
       <ProcurementsTable query={query} currentPage={currentPage} />

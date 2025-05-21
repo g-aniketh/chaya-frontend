@@ -59,7 +59,7 @@ export function AddDryingDialog({
 }: AddDryingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingDryingEntries, setExistingDryingEntries] = useState<Drying[]>(
-    [],
+    []
   );
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
 
@@ -88,22 +88,22 @@ export function AddDryingDialog({
             entries.length > 0 ? Math.max(...entries.map((d) => d.day)) + 1 : 1;
           form.setValue("day", nextDay);
           const lastEntry = entries.sort(
-            (a: { day: number }, b: { day: number }) => b.day - a.day,
+            (a: { day: number }, b: { day: number }) => b.day - a.day
           )[0];
           form.setValue(
             "currentQuantity",
-            lastEntry ? lastEntry.currentQuantity : 0,
+            lastEntry ? lastEntry.currentQuantity : 0
           );
         } catch (error) {
           if (error instanceof AxiosError) {
             toast.error(
               error.response?.data?.error ||
                 error.message ||
-                "Failed to load existing drying entries.",
+                "Failed to load existing drying entries."
             );
           } else if (error instanceof Error) {
             toast.error(
-              error.message || "Failed to load existing drying entries.",
+              error.message || "Failed to load existing drying entries."
             );
           } else {
             toast.error("Failed to load existing drying entries.");
@@ -122,7 +122,7 @@ export function AddDryingDialog({
       await axios.post(
         `/api/processing-stages/${processingStageId}/drying`,
         data,
-        { withCredentials: true },
+        { withCredentials: true }
       );
       toast.success(`Drying data for Day ${data.day} added successfully.`);
       onSuccess();
@@ -138,7 +138,7 @@ export function AddDryingDialog({
       console.error("Error adding drying data:", error);
       if (error instanceof AxiosError) {
         toast.error(
-          `Error: ${error.response?.data?.error || error.message || "Failed to add drying data"}`,
+          `Error: ${error.response?.data?.error || error.message || "Failed to add drying data"}`
         );
       } else if (error instanceof Error) {
         toast.error(`Error: ${error.message || "Failed to add drying data"}`);

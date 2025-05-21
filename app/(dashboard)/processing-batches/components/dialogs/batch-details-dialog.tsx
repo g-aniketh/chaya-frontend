@@ -55,7 +55,7 @@ export function BatchDetailsDialog({
             setBatch(data);
           } else {
             console.error(
-              `BatchDetailsDialog: Batch data for ID ${batchId} not found or failed to load.`,
+              `BatchDetailsDialog: Batch data for ID ${batchId} not found or failed to load.`
             );
           }
         })
@@ -70,7 +70,7 @@ export function BatchDetailsDialog({
   }, [open, batchId, getBatchDetails]);
 
   const getStatusBadgeVariant = (
-    status?: ExtendedProcessingStageStatus,
+    status?: ExtendedProcessingStageStatus
   ): "default" | "secondary" | "destructive" | "outline" => {
     if (!status) return "outline";
     switch (status) {
@@ -317,7 +317,7 @@ export function BatchDetailsDialog({
                                 Stage P{stage.processingCount}
                                 <Badge
                                   variant={getStatusBadgeVariant(
-                                    stage.status as ExtendedProcessingStageStatus,
+                                    stage.status as ExtendedProcessingStageStatus
                                   )}
                                   className="ml-2 text-xs px-1.5 py-0.5"
                                 >
@@ -335,7 +335,7 @@ export function BatchDetailsDialog({
                                 Started:{" "}
                                 {format(
                                   new Date(stage.dateOfProcessing),
-                                  "dd/MM/yy HH:mm",
+                                  "dd/MM/yy HH:mm"
                                 )}
                               </div>{" "}
                               {/* Use div */}
@@ -344,7 +344,7 @@ export function BatchDetailsDialog({
                                   Completed:{" "}
                                   {format(
                                     new Date(stage.dateOfCompletion),
-                                    "dd/MM/yy HH:mm",
+                                    "dd/MM/yy HH:mm"
                                   )}
                                 </div>
                               ) : (
@@ -470,7 +470,7 @@ export function BatchDetailsDialog({
                             </div>
                           )}
                         </div>
-                      ),
+                      )
                     )
                   ) : (
                     <div className="text-sm text-muted-foreground mt-2 text-center py-3">

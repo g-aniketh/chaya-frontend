@@ -1,59 +1,38 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { ThemeProvider } from "@/app/providers/theme-provider";
 import { AuthProvider, useAuth } from "@/app/providers/auth-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "../components/layout/app-sidebar";
 import { FarmersCacheProvider } from "./farmers/context/farmer-cache-context";
-import { useRouter, usePathname } from "next/navigation"; // Import usePathname
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Toaster } from "sonner";
 
-// Content that requires authentication and role checks
 function AuthenticatedContent({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      // This case should ideally be handled by middleware redirecting to /login
-      // but as a fallback.
-      router.push("/login");
-      return;
-    }
+  // if (loading) {
+  //   return (
+  //     <div className="flex h-screen w-screen items-center justify-center">
+  //       Loading application...
+  //     </div>
+  //   );
+  // }
 
-    if (!loading && user) {
-      // Staff-specific redirections
-      if (user.role === "STAFF") {
-        if (
-          pathname.startsWith("/staff") ||
-          pathname.startsWith("/dashboard")
-        ) {
-          router.push("/farmers"); // Default page for staff
-        }
-      }
-      // Admin specific: can access anything in dashboard layout.
-    }
-  }, [user, loading, router, pathname]);
-
-  // Render null or a loading indicator if still loading or if user is null and redirecting
-  if (loading || (!user && pathname !== "/login")) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        Loading application...
-      </div>
-    );
+  if (!user && pathname !== "/login") {
+    return null;
   }
 
-  // If user is STAFF and tries to access restricted pages, they would have been redirected.
-  // So, if we reach here, they are allowed (or an Admin).
   if (
     user?.role === "STAFF" &&
     (pathname.startsWith("/staff") || pathname.startsWith("/dashboard"))
   ) {
-    return null; // Or a specific "Access Denied" component for staff
+    router.push("/farmers");
+    return null;
   }
 
   return (

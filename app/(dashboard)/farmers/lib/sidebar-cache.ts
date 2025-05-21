@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-const SIDEBAR_DATA_KEY = 'app_sidebar_data';
-const SIDEBAR_TIMESTAMP_KEY = 'app_sidebar_timestamp';
+const SIDEBAR_DATA_KEY = "app_sidebar_data";
+const SIDEBAR_TIMESTAMP_KEY = "app_sidebar_timestamp";
 const CACHE_TTL = 3600000; // 1 hour in milliseconds
 
 export interface SidebarCacheItem {
@@ -12,7 +12,7 @@ export interface SidebarCacheItem {
 }
 
 // Helper to check if we're in the browser
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== "undefined";
 
 // Get sidebar data from cache
 export function getSidebarCache<T>(): T | null {
@@ -35,7 +35,7 @@ export function getSidebarCache<T>(): T | null {
 
     return JSON.parse(cachedData) as T;
   } catch (error) {
-    console.error('Error reading sidebar cache:', error);
+    console.error("Error reading sidebar cache:", error);
     return null;
   }
 }
@@ -48,7 +48,7 @@ export function setSidebarCache<T>(data: T): void {
     localStorage.setItem(SIDEBAR_DATA_KEY, JSON.stringify(data));
     localStorage.setItem(SIDEBAR_TIMESTAMP_KEY, Date.now().toString());
   } catch (error) {
-    console.error('Error setting sidebar cache:', error);
+    console.error("Error setting sidebar cache:", error);
   }
 }
 
@@ -60,7 +60,7 @@ export function clearSidebarCache(): void {
     localStorage.removeItem(SIDEBAR_DATA_KEY);
     localStorage.removeItem(SIDEBAR_TIMESTAMP_KEY);
   } catch (error) {
-    console.error('Error clearing sidebar cache:', error);
+    console.error("Error clearing sidebar cache:", error);
   }
 }
 
@@ -91,7 +91,7 @@ export function useSidebarCache<T>(fetchFn: () => Promise<T>) {
         // Cache the new data
         setSidebarCache(freshData);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An error occurred'));
+        setError(err instanceof Error ? err : new Error("An error occurred"));
       } finally {
         setLoading(false);
       }

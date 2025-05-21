@@ -79,7 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.error(
             "Failed to fetch user via /api/auth/current-user: ",
             response.status,
-            response.statusText,
+            response.statusText
           );
           setUserState(null); // Clear user on failure
           if (response.status === 401 && pathname !== "/login") {
@@ -120,7 +120,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const contextValue = useMemo(
     () => ({ user, loading, setUser, signOut }),
-    [user, loading, setUser, signOut],
+    [user, loading, setUser, signOut]
   );
 
   return (

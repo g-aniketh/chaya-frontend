@@ -125,7 +125,7 @@ export function ProcurementForm({
 
     console.log(
       "Submitting data to backend:",
-      JSON.stringify(payload, null, 2),
+      JSON.stringify(payload, null, 2)
     );
 
     try {

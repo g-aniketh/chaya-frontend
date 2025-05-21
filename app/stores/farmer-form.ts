@@ -1,8 +1,8 @@
 /* eslint-disable */
 
-import { create } from 'zustand';
-import { useForm } from 'react-hook-form';
-import { differenceInYears } from 'date-fns';
+import { create } from "zustand";
+import { useForm } from "react-hook-form";
+import { differenceInYears } from "date-fns";
 
 type FormType = ReturnType<typeof useForm>;
 
@@ -35,22 +35,25 @@ interface FarmerFormState {
 
 export const useFarmerFormStore = create<FarmerFormState>((set, get) => ({
   form: null,
-  activeTab: 'personal',
+  activeTab: "personal",
   isSubmitting: false,
-  tabs: ['personal', 'address', 'bank', 'documents', 'fields', 'review'],
+  tabs: ["personal", "address", "bank", "documents", "fields", "review"],
 
-  setForm: form => {
-    console.log('Form set in store:', form ? 'Form object exists' : 'Form is null');
+  setForm: (form) => {
+    console.log(
+      "Form set in store:",
+      form ? "Form object exists" : "Form is null"
+    );
     set({ form });
   },
-  setActiveTab: tab => set({ activeTab: tab }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
 
   addField: () => {
     const { form } = get();
     if (!form) return;
 
-    const fields = form.getValues('fields') || [];
-    form.setValue('fields', [
+    const fields = form.getValues("fields") || [];
+    form.setValue("fields", [
       ...fields,
       {
         areaHa: 0,
@@ -63,23 +66,23 @@ export const useFarmerFormStore = create<FarmerFormState>((set, get) => ({
           altitudeAccuracy: null,
           timestamp: Date.now(),
         },
-        landDocumentUrl: '',
+        landDocumentUrl: "",
       },
     ]);
   },
 
-  removeField: index => {
+  removeField: (index) => {
     const { form } = get();
     if (!form) return;
 
-    const fields = form.getValues('fields') || [];
+    const fields = form.getValues("fields") || [];
     form.setValue(
-      'fields',
+      "fields",
       fields.filter((_: any, i: number) => i !== index)
     );
   },
 
-  setIsSubmitting: value => set({ isSubmitting: value }),
+  setIsSubmitting: (value) => set({ isSubmitting: value }),
 
   goToNextTab: () => {
     const { activeTab, tabs } = get();
@@ -102,7 +105,7 @@ export const useFarmerFormStore = create<FarmerFormState>((set, get) => ({
     if (form) {
       form.reset();
     }
-    set({ activeTab: 'personal', isSubmitting: false });
+    set({ activeTab: "personal", isSubmitting: false });
   },
 
   updateFieldLocation: (index, location) => {
@@ -112,19 +115,19 @@ export const useFarmerFormStore = create<FarmerFormState>((set, get) => ({
     form.setValue(`fields.${index}.location`, location);
   },
 
-  calculateAge: birthDate => {
+  calculateAge: (birthDate) => {
     const { form } = get();
     if (!form || !birthDate) return;
 
     const age = differenceInYears(new Date(), new Date(birthDate));
-    form.setValue('farmer.age', age);
+    form.setValue("farmer.age", age);
   },
 
   notifyFormSuccess: () => {
-    if (typeof window !== 'undefined') {
-      const dataChangedEvent = new CustomEvent('farmerDataChanged');
+    if (typeof window !== "undefined") {
+      const dataChangedEvent = new CustomEvent("farmerDataChanged");
       document.dispatchEvent(dataChangedEvent);
-      console.log('Form submission success event dispatched');
+      console.log("Form submission success event dispatched");
     }
   },
 }));

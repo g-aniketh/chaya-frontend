@@ -41,13 +41,13 @@ interface ProcessingBatchFormState {
     lotNo?: number | null;
   }) => void;
   setAvailableProcurements: (
-    procurements: ProcurementWithFarmerForStore[],
+    procurements: ProcurementWithFarmerForStore[]
   ) => void; // EXPECT THE NEW TYPE
   toggleSelectedProcurement: (
-    procurement: ProcurementWithFarmerForStore,
+    procurement: ProcurementWithFarmerForStore
   ) => void; // EXPECT THE NEW TYPE
   setFirstStageDetails: (
-    details: Partial<CreateProcessingBatchInput["firstStageDetails"]>,
+    details: Partial<CreateProcessingBatchInput["firstStageDetails"]>
   ) => void;
 
   clearLockedFilters: () => void;
@@ -133,7 +133,7 @@ export const useProcessingBatchFormStore = create<ProcessingBatchFormState>(
       // procurement is ProcurementWithFarmerForStore
       set((state) => {
         const isSelected = state.selectedProcurementIds.includes(
-          procurement.id,
+          procurement.id
         );
         let newSelectedIds = [...state.selectedProcurementIds];
         let newLockedCrop = state.lockedCrop;
@@ -143,7 +143,7 @@ export const useProcessingBatchFormStore = create<ProcessingBatchFormState>(
 
         if (isSelected) {
           newSelectedIds = newSelectedIds.filter(
-            (pid) => pid !== procurement.id,
+            (pid) => pid !== procurement.id
           );
           if (newSelectedIds.length === 0) {
             newFilterCriteriaLocked = !!(
@@ -173,7 +173,7 @@ export const useProcessingBatchFormStore = create<ProcessingBatchFormState>(
               newSelectedIds.push(procurement.id);
             } else {
               toast.error(
-                "This procurement does not match the established batch criteria (Crop, Lot No, Procured Form).",
+                "This procurement does not match the established batch criteria (Crop, Lot No, Procured Form)."
               );
             }
           }
@@ -208,5 +208,5 @@ export const useProcessingBatchFormStore = create<ProcessingBatchFormState>(
         ...initialCoreState,
         firstStageDetails: { ...initialFirstStageDetailsState },
       }),
-  }),
+  })
 );

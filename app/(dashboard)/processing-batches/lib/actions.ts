@@ -14,7 +14,7 @@ import type {
 const BACKEND_API_URL = process.env.PROD_BACKEND_URL || "http://localhost:5000";
 
 export async function getProcessingBatchDetailsById(
-  batchId: number,
+  batchId: number
 ): Promise<ProcessingBatchWithDetails> {
   if (isNaN(batchId)) {
     throw new Error("Batch ID must be a valid number.");
@@ -41,7 +41,7 @@ export async function getProcessingBatchDetailsById(
     if (!response.ok) {
       throw new Error(
         data.error ||
-          `Failed to fetch processing batch ${batchId} from backend. Status: ${response.status}`,
+          `Failed to fetch processing batch ${batchId} from backend. Status: ${response.status}`
       );
     }
     return data as ProcessingBatchWithDetails;
@@ -52,14 +52,14 @@ export async function getProcessingBatchDetailsById(
         : "Internal server error in server action.";
     console.error(
       `[Server Action Error] getProcessingBatchDetailsById(${batchId}):`,
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }
 }
 
 export async function getDryingEntriesForStage(
-  stageId: number,
+  stageId: number
 ): Promise<Drying[]> {
   if (isNaN(stageId)) {
     throw new Error("Stage ID must be a valid number.");
@@ -76,7 +76,7 @@ export async function getDryingEntriesForStage(
       {
         method: "GET",
         headers: { Cookie: `token=${token}` },
-      },
+      }
     );
     const data = await response.json();
     if (!response.ok) {
@@ -90,7 +90,7 @@ export async function getDryingEntriesForStage(
         : "Internal server error fetching drying entries.";
     console.error(
       `[Server Action Error] getDryingEntriesForStage(${stageId}):`,
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }
@@ -127,13 +127,13 @@ export async function getProcessingBatchesList(params: {
         method: "GET",
         headers: { Cookie: `token=${token}` },
         cache: "no-store",
-      },
+      }
     );
 
     const data = await response.json();
     if (!response.ok) {
       throw new Error(
-        data.error || "Failed to fetch processing batches list from backend",
+        data.error || "Failed to fetch processing batches list from backend"
       );
     }
     return data;
@@ -144,7 +144,7 @@ export async function getProcessingBatchesList(params: {
         : "Internal server error fetching processing batches list.";
     console.error(
       "[Server Action Error] getProcessingBatchesList:",
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }
@@ -152,7 +152,7 @@ export async function getProcessingBatchesList(params: {
 
 export async function finalizeProcessingStageAction(
   stageId: number,
-  payload: FinalizeProcessingStageInput,
+  payload: FinalizeProcessingStageInput
 ): Promise<any> {
   if (isNaN(stageId)) {
     throw new Error("Stage ID must be a valid number.");
@@ -173,7 +173,7 @@ export async function finalizeProcessingStageAction(
           Cookie: `token=${token}`,
         },
         body: JSON.stringify(payload),
-      },
+      }
     );
 
     const data = await response.json();
@@ -188,7 +188,7 @@ export async function finalizeProcessingStageAction(
         : "Internal server error finalizing stage.";
     console.error(
       `[Server Action Error] finalizeProcessingStageAction(${stageId}):`,
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }

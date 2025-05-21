@@ -64,7 +64,7 @@ export function FarmerForm({
         const response = await axios.post(
           `${apiBaseUrl}/api/farmers`,
           data,
-          axiosConfig,
+          axiosConfig
         );
         console.log("POST response:", response.data);
         toast.success("Farmer added successfully");
@@ -73,7 +73,7 @@ export function FarmerForm({
         const response = await axios.put(
           `${apiBaseUrl}/api/farmers/${farmerId}`,
           data,
-          axiosConfig,
+          axiosConfig
         );
         console.log("PUT response:", response.data);
         toast.success("Farmer updated successfully");
@@ -82,7 +82,7 @@ export function FarmerForm({
       const dataChangedEvent = new CustomEvent("farmerDataChanged");
       document.dispatchEvent(dataChangedEvent);
       console.log(
-        "Data changed event dispatched after successful form submission",
+        "Data changed event dispatched after successful form submission"
       );
 
       onOpenChange(false);
@@ -94,7 +94,7 @@ export function FarmerForm({
           toast.error("Your session has expired. Please log in again.");
         } else {
           toast.error(
-            `Error: ${error.response?.data?.error || error.message || "Something went wrong"}`,
+            `Error: ${error.response?.data?.error || error.message || "Something went wrong"}`
           );
         }
       } else {
@@ -176,7 +176,7 @@ export function FarmerForm({
                       const errors = form.formState.errors;
                       console.log(
                         "Detailed errors:",
-                        JSON.stringify(errors, null, 2),
+                        JSON.stringify(errors, null, 2)
                       );
 
                       if (errors.farmer)
@@ -191,12 +191,12 @@ export function FarmerForm({
                       handleSubmit(values);
                     } else {
                       toast.error(
-                        "Form validation failed. Please check all tabs for errors.",
+                        "Form validation failed. Please check all tabs for errors."
                       );
                     }
                   } else {
                     toast.error(
-                      "Form data is not available. Please try again.",
+                      "Form data is not available. Please try again."
                     );
                   }
                 }}

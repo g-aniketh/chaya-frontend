@@ -48,7 +48,7 @@ const criteriaSchema = z
     {
       message: "Either Crop or Lot Number (or both) must be provided.",
       path: ["crop"],
-    },
+    }
   );
 
 type CriteriaFormValues = z.infer<typeof criteriaSchema>;
@@ -105,7 +105,7 @@ export function SelectCriteriaStep() {
                   <Select
                     onValueChange={(value) =>
                       field.onChange(
-                        value === "NONE_SELECTED_VALUE" ? null : value,
+                        value === "NONE_SELECTED_VALUE" ? null : value
                       )
                     }
                     value={field.value || undefined} // Pass undefined for placeholder
@@ -154,7 +154,7 @@ export function SelectCriteriaStep() {
                             ? null
                             : isNaN(parseInt(val, 4))
                               ? null
-                              : parseInt(val, 4),
+                              : parseInt(val, 4)
                         );
                       }}
                     />

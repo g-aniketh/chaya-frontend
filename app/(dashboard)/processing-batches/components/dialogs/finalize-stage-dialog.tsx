@@ -90,7 +90,7 @@ export function FinalizeStageDialog({
       getDryingEntriesForStage(processingStageId)
         .then((dryingEntries) => {
           const latestDryingEntry = dryingEntries?.sort(
-            (a, b) => b.day - a.day,
+            (a, b) => b.day - a.day
           )[0];
           const autoFillQuantity =
             latestDryingEntry?.currentQuantity ?? currentInitialQuantity;
@@ -103,8 +103,7 @@ export function FinalizeStageDialog({
         })
         .catch((err) => {
           toast.error(
-            err.message ||
-              "Could not load latest drying quantity for autofill.",
+            err.message || "Could not load latest drying quantity for autofill."
           );
           console.error("Error fetching drying entries for autofill:", err);
           form.reset({
@@ -128,7 +127,7 @@ export function FinalizeStageDialog({
       };
       await finalizeProcessingStageAction(processingStageId, payload);
       toast.success(
-        `Stage P${processingCount} for Batch ${batchCode} finalized successfully.`,
+        `Stage P${processingCount} for Batch ${batchCode} finalized successfully.`
       );
       document.dispatchEvent(new CustomEvent("processingBatchDataChanged"));
       onSuccess();
@@ -173,7 +172,7 @@ export function FinalizeStageDialog({
                           variant="outline"
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (

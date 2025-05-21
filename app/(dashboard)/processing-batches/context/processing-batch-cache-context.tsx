@@ -1,9 +1,21 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import type { ProcessingBatchWithSummary, ProcessingBatchWithDetails } from '../lib/types';
-import { toast } from 'sonner';
-import { getProcessingBatchDetailsById, getProcessingBatchesList } from '../lib/actions';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
+import type {
+  ProcessingBatchWithSummary,
+  ProcessingBatchWithDetails,
+} from "../lib/types";
+import { toast } from "sonner";
+import {
+  getProcessingBatchDetailsById,
+  getProcessingBatchesList,
+} from "../lib/actions";
 
 interface ProcessingBatchCacheContextType {
   processingBatchesSummary: Record<string, ProcessingBatchWithSummary[]>;
@@ -20,40 +32,77 @@ interface ProcessingBatchCacheContextType {
     query: string,
     statusFilter: string
   ) => Promise<ProcessingBatchWithSummary[]>;
-  getBatchDetails: (batchId: number) => Promise<ProcessingBatchWithDetails | null>;
+  getBatchDetails: (
+    batchId: number
+  ) => Promise<ProcessingBatchWithDetails | null>;
   clearBatchDetailCache: (batchId: number) => void;
 }
 
-const ProcessingBatchCacheContext = createContext<ProcessingBatchCacheContextType | undefined>(undefined);
+const ProcessingBatchCacheContext = createContext<
+  ProcessingBatchCacheContextType | undefined
+>(undefined);
 
-export function ProcessingBatchCacheProvider({ children }: { children: React.ReactNode }) {
+export function ProcessingBatchCacheProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [processingBatchesSummary, setProcessingBatchesSummary] = useState<
     Record<string, ProcessingBatchWithSummary[]>
   >({});
   const [totalPages, setTotalPages] = useState<Record<string, number>>({});
-  const [batchDetailsCache, setBatchDetailsCache] = useState<Record<number, ProcessingBatchWithDetails>>({});
+  const [batchDetailsCache, setBatchDetailsCache] = useState<
+    Record<number, ProcessingBatchWithDetails>
+  >({});
 
-  const createListKey = useCallback((page: number, query: string, status: string) => `${query}:${status}:${page}`, []);
+  const createListKey = useCallback(
+    (page: number, query: string, status: string) =>
+      `${query}:${status}:${page}`,
+    []
+  );
 
   const fetchProcessingBatchesSummary = useCallback(
-    async (page: number, query: string, statusFilter: string): Promise<ProcessingBatchWithSummary[]> => {
+    async (
+      page: number,
+      query: string,
+      statusFilter: string
+    ): Promise<ProcessingBatchWithSummary[]> => {
       const key = createListKey(page, query, statusFilter);
       if (processingBatchesSummary[key]) {
         return processingBatchesSummary[key];
       }
       try {
-        const data = await getProcessingBatchesList({ page, limit: 10, search: query, statusFilter });
+        const data = await getProcessingBatchesList({
+          page,
+          limit: 10,
+          search: query,
+          statusFilter,
+        });
 
-        setProcessingBatchesSummary(prev => ({ ...prev, [key]: data.processingBatches }));
-        setTotalPages(prev => ({ ...prev, [`${query}:${statusFilter}`]: data.pagination.totalPages }));
+        setProcessingBatchesSummary((prev) => ({
+          ...prev,
+          [key]: data.processingBatches,
+        }));
+        setTotalPages((prev) => ({
+          ...prev,
+          [`${query}:${statusFilter}`]: data.pagination.totalPages,
+        }));
         return data.processingBatches;
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch processing batches summary.';
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch processing batches summary.";
         toast.error(errorMessage);
         throw error;
       }
     },
-    [processingBatchesSummary, createListKey, setProcessingBatchesSummary, setTotalPages]
+    [
+      processingBatchesSummary,
+      createListKey,
+      setProcessingBatchesSummary,
+      setTotalPages,
+    ]
   );
 
   const fetchTotalPages = useCallback(
@@ -63,12 +112,20 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
         return totalPages[key];
       }
       try {
-        const data = await getProcessingBatchesList({ page: 1, limit: 10, search: query, statusFilter });
+        const data = await getProcessingBatchesList({
+          page: 1,
+          limit: 10,
+          search: query,
+          statusFilter,
+        });
         const pages = data.pagination.totalPages;
-        setTotalPages(prev => ({ ...prev, [key]: pages }));
+        setTotalPages((prev) => ({ ...prev, [key]: pages }));
         return pages;
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch pagination data.';
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch pagination data.";
         toast.error(errorMessage);
         return 1;
       }
@@ -77,17 +134,34 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
   );
 
   const refreshCurrentPageSummary = useCallback(
-    async (page: number, query: string, statusFilter: string): Promise<ProcessingBatchWithSummary[]> => {
+    async (
+      page: number,
+      query: string,
+      statusFilter: string
+    ): Promise<ProcessingBatchWithSummary[]> => {
       const key = createListKey(page, query, statusFilter);
       try {
-        const data = await getProcessingBatchesList({ page, limit: 10, search: query, statusFilter });
+        const data = await getProcessingBatchesList({
+          page,
+          limit: 10,
+          search: query,
+          statusFilter,
+        });
 
-        setProcessingBatchesSummary(prev => ({ ...prev, [key]: data.processingBatches }));
-        setTotalPages(prev => ({ ...prev, [`${query}:${statusFilter}`]: data.pagination.totalPages }));
+        setProcessingBatchesSummary((prev) => ({
+          ...prev,
+          [key]: data.processingBatches,
+        }));
+        setTotalPages((prev) => ({
+          ...prev,
+          [`${query}:${statusFilter}`]: data.pagination.totalPages,
+        }));
         return data.processingBatches;
       } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : `Failed to refresh batches data for page ${page}.`;
+          error instanceof Error
+            ? error.message
+            : `Failed to refresh batches data for page ${page}.`;
         toast.error(errorMessage);
         throw error;
       }
@@ -102,11 +176,13 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
       }
       try {
         const batchData = await getProcessingBatchDetailsById(batchId);
-        setBatchDetailsCache(prev => ({ ...prev, [batchId]: batchData }));
+        setBatchDetailsCache((prev) => ({ ...prev, [batchId]: batchData }));
         return batchData;
       } catch (error: unknown) {
         const errorMessage =
-          error instanceof Error ? error.message : `Failed to fetch details for batch ID ${batchId}.`;
+          error instanceof Error
+            ? error.message
+            : `Failed to fetch details for batch ID ${batchId}.`;
         toast.error(errorMessage);
         return null;
       }
@@ -116,7 +192,7 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
 
   const clearBatchDetailCache = useCallback(
     (batchId: number) => {
-      setBatchDetailsCache(prev => {
+      setBatchDetailsCache((prev) => {
         const newState = { ...prev };
         delete newState[batchId];
         return newState;
@@ -129,7 +205,7 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
     setProcessingBatchesSummary({});
     setTotalPages({});
     setBatchDetailsCache({});
-    toast.info('Processing batches cache cleared.');
+    toast.info("Processing batches cache cleared.");
   }, [setProcessingBatchesSummary, setTotalPages, setBatchDetailsCache]);
 
   const value = useMemo(
@@ -155,13 +231,19 @@ export function ProcessingBatchCacheProvider({ children }: { children: React.Rea
     ]
   );
 
-  return <ProcessingBatchCacheContext.Provider value={value}>{children}</ProcessingBatchCacheContext.Provider>;
+  return (
+    <ProcessingBatchCacheContext.Provider value={value}>
+      {children}
+    </ProcessingBatchCacheContext.Provider>
+  );
 }
 
 export function useProcessingBatchCache() {
   const context = useContext(ProcessingBatchCacheContext);
   if (context === undefined) {
-    throw new Error('useProcessingBatchCache must be used within a ProcessingBatchCacheProvider');
+    throw new Error(
+      "useProcessingBatchCache must be used within a ProcessingBatchCacheProvider"
+    );
   }
   return context;
 }

@@ -66,7 +66,7 @@ export function LocationButton({ onLocationUpdate }: LocationButtonProps) {
         toast.error(errorMessage);
         setIsLoading(false);
       },
-      options,
+      options
     );
   };
 

@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_API_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
 
 export async function GET(request: NextRequest) {
-  const appSessionToken = request.cookies.get("app_session_token")?.value;
+  const token = request.cookies.get("token")?.value;
 
-  if (!appSessionToken) {
+  if (!token) {
     return NextResponse.json(
-      { message: "Not authenticated (no app session)" },
-      { status: 401 },
+      { message: "Not authenticated (no token)" },
+      { status: 401 }
     );
   }
 
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${appSessionToken}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -27,11 +28,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           message:
-            backendData.message ||
-            backendData.error ||
+            backendData.message ??
+            backendData.error ??
             "Failed to fetch user from backend",
         },
-        { status: backendResponse.status },
+        { status: backendResponse.status }
       );
     }
 
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     console.error("Current user API route error:", errorMessage);
     return NextResponse.json(
       { message: "An internal server error occurred." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

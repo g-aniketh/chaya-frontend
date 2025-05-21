@@ -78,7 +78,7 @@ export function AddStaffDialog({
       await axios.post(
         `${BACKEND_API_URL}/api/auth/register`,
         data,
-        axiosConfig,
+        axiosConfig
       );
       toast.success("Staff member added successfully");
       form.reset();

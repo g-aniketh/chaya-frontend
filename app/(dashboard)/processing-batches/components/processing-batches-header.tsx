@@ -15,7 +15,7 @@ export default function ProcessingBatchesHeader() {
     // TODO: Implement export functionality for processing batches
     console.log("Export processing batches data clicked");
     toast.info(
-      "Export functionality for processing batches is not yet implemented.",
+      "Export functionality for processing batches is not yet implemented."
     );
   };
 

@@ -44,12 +44,12 @@ export async function getProcurements({
     if (axios.isAxiosError(error)) {
       console.error(
         "Error fetching procurements:",
-        error.response?.data || error.message,
+        error.response?.data || error.message
       );
       throw new Error(
         error.response?.data?.error ||
           error.message ||
-          "Failed to fetch procurements",
+          "Failed to fetch procurements"
       );
     }
     console.error("Error fetching procurements:", error);
@@ -85,12 +85,12 @@ export async function getProcurementPages(query = "") {
     if (axios.isAxiosError(error)) {
       console.error(
         "Error fetching procurement count:",
-        error.response?.data || error.message,
+        error.response?.data || error.message
       );
       throw new Error(
         error.response?.data?.error ||
           error.message ||
-          "Failed to fetch procurement pages",
+          "Failed to fetch procurement pages"
       );
     }
     console.error("Error fetching procurement count:", error);
@@ -132,7 +132,7 @@ export async function bulkDeleteProcurements(ids: number[]) {
         : "Unknown error during bulk delete";
     console.error(
       "Error bulk deleting procurements (server action):",
-      errorMessage,
+      errorMessage
     );
     return { success: false, error: errorMessage };
   }
@@ -191,13 +191,13 @@ export async function getUnbatchedProcurementsAction(params?: {
         method: "GET",
         headers: { Cookie: `token=${token}` },
         cache: "no-store",
-      },
+      }
     );
 
     const data = await response.json();
     if (!response.ok) {
       throw new Error(
-        data.error || "Failed to fetch unbatched procurements from backend",
+        data.error || "Failed to fetch unbatched procurements from backend"
       );
     }
     return data.procurements || [];
@@ -208,7 +208,7 @@ export async function getUnbatchedProcurementsAction(params?: {
         : "Internal server error fetching unbatched procurements.";
     console.error(
       "[Server Action Error] getUnbatchedProcurementsAction:",
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }
@@ -216,7 +216,7 @@ export async function getUnbatchedProcurementsAction(params?: {
 
 export async function updateProcurementAction(
   procurementId: number,
-  payload: Partial<UpdateProcurementInput>,
+  payload: Partial<UpdateProcurementInput>
 ): Promise<{ procurement: ProcurementWithRelations }> {
   if (isNaN(procurementId)) {
     throw new Error("Procurement ID must be a valid number.");
@@ -237,13 +237,13 @@ export async function updateProcurementAction(
           Cookie: `token=${token}`,
         },
         body: JSON.stringify(payload),
-      },
+      }
     );
 
     const data = await response.json();
     if (!response.ok) {
       throw new Error(
-        data.error || `Failed to update procurement ${procurementId}`,
+        data.error || `Failed to update procurement ${procurementId}`
       );
     }
     return data;
@@ -254,7 +254,7 @@ export async function updateProcurementAction(
         : "Internal server error updating procurement.";
     console.error(
       `[Server Action Error] updateProcurementAction(${procurementId}):`,
-      errorMessage,
+      errorMessage
     );
     throw new Error(errorMessage);
   }

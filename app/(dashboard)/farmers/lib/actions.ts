@@ -81,7 +81,7 @@ export async function createFarmer(userId: number, formData: FarmerFormData) {
 export async function updateFarmer(
   userId: number,
   farmerId: number,
-  formData: Partial<FarmerFormData>,
+  formData: Partial<FarmerFormData>
 ) {
   try {
     const { bankDetails, documents, fields, ...farmerData } = formData;

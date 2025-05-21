@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { getFarmers, getFarmerPages } from '../lib/actions';
-import { FarmerWithRelations } from '../lib/types';
-import { toast } from 'sonner';
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { getFarmers, getFarmerPages } from "../lib/actions";
+import { FarmerWithRelations } from "../lib/types";
+import { toast } from "sonner";
 
 interface FarmersCacheContextType {
   farmers: Record<string, FarmerWithRelations[]>;
@@ -11,17 +11,35 @@ interface FarmersCacheContextType {
   fetchFarmers: (page: number, query: string) => Promise<FarmerWithRelations[]>;
   fetchTotalPages: (query: string) => Promise<number>;
   clearCache: () => void;
-  prefetchPages: (startPage: number, endPage: number, query: string) => Promise<void>;
-  refreshCurrentPage: (page: number, query: string) => Promise<FarmerWithRelations[]>;
+  prefetchPages: (
+    startPage: number,
+    endPage: number,
+    query: string
+  ) => Promise<void>;
+  refreshCurrentPage: (
+    page: number,
+    query: string
+  ) => Promise<FarmerWithRelations[]>;
 }
 
-const FarmersCacheContext = createContext<FarmersCacheContextType | undefined>(undefined);
+const FarmersCacheContext = createContext<FarmersCacheContextType | undefined>(
+  undefined
+);
 
-export function FarmersCacheProvider({ children }: { children: React.ReactNode }) {
-  const [farmers, setFarmers] = useState<Record<string, FarmerWithRelations[]>>({});
+export function FarmersCacheProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [farmers, setFarmers] = useState<Record<string, FarmerWithRelations[]>>(
+    {}
+  );
   const [totalPages, setTotalPages] = useState<Record<string, number>>({});
 
-  const createKey = useCallback((page: number, query: string) => `${query}:${page}`, []);
+  const createKey = useCallback(
+    (page: number, query: string) => `${query}:${page}`,
+    []
+  );
 
   const fetchFarmers = useCallback(
     async (page: number, query: string): Promise<FarmerWithRelations[]> => {
@@ -34,14 +52,17 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
 
       console.log(`Fetching page ${page}, query "${query}" from server`);
       try {
-        const data = (await getFarmers({ page, query })) as FarmerWithRelations[];
-        setFarmers(prev => ({
+        const data = (await getFarmers({
+          page,
+          query,
+        })) as FarmerWithRelations[];
+        setFarmers((prev) => ({
           ...prev,
           [key]: data,
         }));
         return data;
       } catch (error) {
-        toast.error('Failed to fetch farmers data from server.');
+        toast.error("Failed to fetch farmers data from server.");
         throw error;
       }
     },
@@ -56,13 +77,13 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
 
       try {
         const pages = await getFarmerPages(query);
-        setTotalPages(prev => ({
+        setTotalPages((prev) => ({
           ...prev,
           [query]: pages,
         }));
         return pages;
       } catch (error) {
-        toast.error('Failed to fetch pagination data.');
+        toast.error("Failed to fetch pagination data.");
         throw error;
       }
     },
@@ -71,7 +92,9 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
 
   const prefetchPages = useCallback(
     async (startPage: number, endPage: number, query: string) => {
-      console.log(`Prefetching pages ${startPage}-${endPage} for query "${query}"`);
+      console.log(
+        `Prefetching pages ${startPage}-${endPage} for query "${query}"`
+      );
 
       for (let page = startPage; page <= endPage; page++) {
         const key = createKey(page, query);
@@ -83,7 +106,7 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
             page,
             query,
           })) as FarmerWithRelations[];
-          setFarmers(prev => ({
+          setFarmers((prev) => ({
             ...prev,
             [key]: data,
           }));
@@ -100,13 +123,15 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
     async (page: number, query: string): Promise<FarmerWithRelations[]> => {
       const key = createKey(page, query);
 
-      console.log(`Force refreshing page ${page}, query "${query}" from server`);
+      console.log(
+        `Force refreshing page ${page}, query "${query}" from server`
+      );
       try {
         const data = (await getFarmers({
           page,
           query,
         })) as FarmerWithRelations[];
-        setFarmers(prev => ({
+        setFarmers((prev) => ({
           ...prev,
           [key]: data,
         }));
@@ -124,7 +149,7 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
   const clearCache = useCallback(() => {
     setFarmers({});
     setTotalPages({});
-    toast.success('Cache cleared successfully.');
+    toast.success("Cache cleared successfully.");
   }, []);
 
   const value = {
@@ -137,14 +162,20 @@ export function FarmersCacheProvider({ children }: { children: React.ReactNode }
     refreshCurrentPage,
   };
 
-  return <FarmersCacheContext.Provider value={value}>{children}</FarmersCacheContext.Provider>;
+  return (
+    <FarmersCacheContext.Provider value={value}>
+      {children}
+    </FarmersCacheContext.Provider>
+  );
 }
 
 export function useFarmersCache() {
   const context = useContext(FarmersCacheContext);
 
   if (context === undefined) {
-    throw new Error('useFarmersCache must be used within a FarmersCacheProvider');
+    throw new Error(
+      "useFarmersCache must be used within a FarmersCacheProvider"
+    );
   }
 
   return context;

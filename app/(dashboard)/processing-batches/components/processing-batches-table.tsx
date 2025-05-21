@@ -83,7 +83,7 @@ export default function ProcessingBatchesTable({
     { id: "createdAt", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
 
   const [columnVisibility, setColumnVisibility] = useState(() => {
@@ -133,7 +133,7 @@ export default function ProcessingBatchesTable({
         setLoading(false);
       }
     },
-    [fetchProcessingBatchesSummary],
+    [fetchProcessingBatchesSummary]
   );
 
   const handleRefresh = useCallback(async () => {
@@ -143,7 +143,7 @@ export default function ProcessingBatchesTable({
       const freshData = await refreshCurrentPageSummary(
         currentPage,
         query,
-        statusFilter,
+        statusFilter
       );
       setRecords(freshData);
       toast.success("Data refreshed successfully");
@@ -184,7 +184,7 @@ export default function ProcessingBatchesTable({
     return () =>
       document.removeEventListener(
         "processingBatchDataChanged",
-        handleDataChange,
+        handleDataChange
       );
   }, [handleRefresh]);
 
@@ -203,7 +203,7 @@ export default function ProcessingBatchesTable({
 
   const openDialog = (
     dialogSetter: React.Dispatch<React.SetStateAction<boolean>>,
-    batch: ProcessingBatchWithSummary, // This is correct for table rows
+    batch: ProcessingBatchWithSummary // This is correct for table rows
   ) => {
     setSelectedBatchForAction(batch); // Keep this for other dialogs and delete
     dialogSetter(true);
@@ -215,7 +215,7 @@ export default function ProcessingBatchesTable({
     try {
       await axios.delete(
         `/api/processing-batches/${selectedBatchForAction.id}`,
-        { withCredentials: true },
+        { withCredentials: true }
       );
       toast.success(`Batch ${selectedBatchForAction.batchCode} deleted.`);
       setShowDeleteBatchDialog(false);
@@ -227,7 +227,7 @@ export default function ProcessingBatchesTable({
         toast.error(
           error.response?.data?.error ||
             error.message ||
-            "Failed to delete batch.",
+            "Failed to delete batch."
         );
       } else if (error instanceof Error) {
         toast.error(`Failed to delete batch: ${error.message}`);
@@ -318,7 +318,7 @@ export default function ProcessingBatchesTable({
                       >
                         {flexRender(
                           header.column.columnDef.header,
-                          header.getContext(),
+                          header.getContext()
                         )}
                         {header.column.getCanSort() && (
                           <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
@@ -353,7 +353,7 @@ export default function ProcessingBatchesTable({
                       <TableCell key={cell.id} className="whitespace-nowrap">
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}
@@ -392,7 +392,7 @@ export default function ProcessingBatchesTable({
                               onClick={() =>
                                 openDialog(
                                   setShowFinalizeStageDialog,
-                                  batchSummary,
+                                  batchSummary
                                 )
                               }
                               title="Finalize Stage"
@@ -411,7 +411,7 @@ export default function ProcessingBatchesTable({
                               onClick={() =>
                                 openDialog(
                                   setShowStartNextStageDialog,
-                                  batchSummary,
+                                  batchSummary
                                 )
                               }
                               title="Start Next Stage"
@@ -426,7 +426,7 @@ export default function ProcessingBatchesTable({
                               onClick={() =>
                                 openDialog(
                                   setShowRecordSaleDialog,
-                                  batchSummary,
+                                  batchSummary
                                 )
                               }
                               title="Record Sale"

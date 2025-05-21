@@ -68,7 +68,7 @@ export function FarmerFormProvider({
                   yieldEstimate: field.yieldEstimate,
                   location: field.location,
                   landDocumentUrl: field.landDocumentUrl,
-                }),
+                })
               )
             : [
                 {
@@ -140,7 +140,7 @@ export function FarmerFormProvider({
   });
 
   const setForm = useFarmerFormStore(
-    (state: { setForm: any }) => state.setForm,
+    (state: { setForm: any }) => state.setForm
   );
 
   useEffect(() => {

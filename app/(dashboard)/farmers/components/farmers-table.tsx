@@ -92,7 +92,7 @@ export default function FarmersTable({
         prefetchPages(
           Math.min(...pagesToPrefetch),
           Math.max(...pagesToPrefetch),
-          query,
+          query
         );
       }
     } catch (error) {
@@ -214,7 +214,7 @@ export default function FarmersTable({
 
   useEffect(() => {
     const handleViewFarmerEvent = (
-      e: CustomEvent<{ farmer: FarmerWithRelations }>,
+      e: CustomEvent<{ farmer: FarmerWithRelations }>
     ) => {
       handleViewDetails(e.detail.farmer);
     };
@@ -224,21 +224,21 @@ export default function FarmersTable({
 
     document.addEventListener(
       "viewFarmer",
-      handleViewFarmerEvent as EventListener,
+      handleViewFarmerEvent as EventListener
     );
     document.addEventListener(
       "farmerDataChanged",
-      handleDataChangeEvent as EventListener,
+      handleDataChangeEvent as EventListener
     );
 
     return () => {
       document.removeEventListener(
         "viewFarmer",
-        handleViewFarmerEvent as EventListener,
+        handleViewFarmerEvent as EventListener
       );
       document.removeEventListener(
         "farmerDataChanged",
-        handleDataChangeEvent as EventListener,
+        handleDataChangeEvent as EventListener
       );
     };
   }, [currentPage, query, handleRefresh]);
@@ -260,7 +260,7 @@ export default function FarmersTable({
                   key={`header-${item}`}
                   className="h-4 bg-gray-200 rounded w-32 mx-4 animate-pulse"
                 ></div>
-              ),
+              )
             )}
           </div>
           {Array.from({ length: 10 }).map((_, i) => (
@@ -336,7 +336,7 @@ export default function FarmersTable({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   ))}
@@ -361,7 +361,7 @@ export default function FarmersTable({
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       ))}

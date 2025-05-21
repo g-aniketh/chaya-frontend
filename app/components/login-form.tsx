@@ -2,135 +2,257 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { useAuth } from "@/app/providers/auth-provider";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Label } from "@/components/ui//label";
-import { Input } from "@/components/ui//input";
-import { Button } from "@/components/ui//button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Loader2,
+  Mail,
+  Lock,
+  AlertCircle,
+  HelpCircle,
+  Github,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-  throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
-}
-
-type LoginFormProps = Readonly<React.ComponentPropsWithoutRef<"form">>;
-
-export function LoginForm({ className, ...props }: LoginFormProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+export function LoginForm() {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setError(null);
+    setShowErrorPopup(false);
 
     try {
-      // VVVVVV  CALL YOUR NEXT.JS API ROUTE VVVVVV
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        // `credentials: "include"` is generally not needed when fetching from
-        // the same domain (your Next.js frontend to your Next.js API route).
-        // The browser handles cookies automatically for same-domain requests.
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+        signal: controller.signal,
       });
 
-      const data = await response.json(); // Always try to parse JSON
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(data.message ?? "Invalid credentials");
+        const data = await response.json();
+        throw new Error(data.message ?? "Login failed");
       }
 
-      // `data` should now be { user: { ... } } from your Next.js API route
-      console.log("Data from Next.js API route:", data);
-      setUser(data.user); // Update AuthContext
-      console.log("User data set in AuthContext");
       router.push("/dashboard");
-    } catch (err: unknown) {
+    } catch (err) {
       if (err instanceof Error) {
-        setError(err.message || "An error occurred during login");
+        if (err.name === "AbortError") {
+          setError(
+            "Server is currently on cold start. Please try again in a few moments."
+          );
+        } else {
+          setError(err.message);
+        }
       } else {
-        setError("An error occurred during login");
+        setError("An unexpected error occurred");
       }
-      console.error("Login form error:", err);
+      setShowErrorPopup(true);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
-    <form
-      className={cn(
-        "flex flex-col gap-6 p-4 md:p-6 bg-card rounded-lg shadow",
-        className,
-      )}
-      {...props}
-      onSubmit={handleSubmit}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-md mx-auto"
     >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold text-primary">
-          Login to your account
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Enter your email below to login to your account
-        </p>
-      </div>
-
-      {error && (
-        <Alert variant="destructive" className="mb-2">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <Label htmlFor="email" className="text-sm font-medium">
-            Email
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="email@example.com"
-            required
-            className="border border-input focus:ring-primary focus:border-primary"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        <div className="grid gap-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-sm font-medium">
-              Password
-            </Label>
-          </div>
-          <Input
-            id="password"
-            type="password"
-            required
-            className="border border-input focus:ring-primary focus:border-primary"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full bg-primary text-primary-foreground"
-          disabled={isLoading}
+      <div className="bg-card/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-green-100/50 dark:border-green-900/50">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-center mb-8"
         >
-          {isLoading ? "Logging in..." : "Login"}
-        </Button>
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            Welcome Back
+          </h2>
+          <p className="text-muted-foreground">Sign in to your account</p>
+        </motion.div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="pl-10 bg-background/50"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="pl-10 bg-background/50"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex items-center gap-2 text-destructive text-sm bg-destructive/10 p-3 rounded-lg"
+              >
+                <AlertCircle className="h-4 w-4" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <Button
+            type="submit"
+            className={cn(
+              "w-full bg-green-600 hover:bg-green-700 text-white",
+              "transition-all duration-300",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Sign in"
+            )}
+          </Button>
+        </form>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 space-y-4 text-center"
+        >
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <HelpCircle className="h-4 w-4" />
+            <span>Need help? Contact the admin or developers</span>
+          </div>
+
+          <a
+            href="https://github.com/fyzanshaik/chaya-frontend/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group"
+          >
+            <Github className="h-5 w-5 group-hover:animate-pulse" />
+            <span>Create an Issue</span>
+          </a>
+        </motion.div>
       </div>
-    </form>
+
+      {/* Error Popup */}
+      <AnimatePresence>
+        {showErrorPopup && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              className="bg-card p-6 rounded-xl shadow-xl max-w-md w-full relative"
+            >
+              <button
+                onClick={() => setShowErrorPopup(false)}
+                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-destructive">
+                  <AlertCircle className="h-6 w-6" />
+                  <h3 className="text-lg font-semibold">Login Failed</h3>
+                </div>
+
+                <p className="text-muted-foreground">
+                  {error ===
+                  "Server is currently on cold start. Please try again in a few moments."
+                    ? "The server is currently starting up. Please wait a moment and try again."
+                    : "We encountered an issue with your login attempt. Please notify the maintainer or create an issue on GitHub."}
+                </p>
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowErrorPopup(false)}
+                    className="flex-1"
+                  >
+                    Close
+                  </Button>
+                  <a
+                    href="https://github.com/fyzanshaik/chaya-frontend/issues/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button className="w-full bg-black text-white hover:bg-black/90">
+                      Create Issue
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

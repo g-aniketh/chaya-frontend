@@ -55,7 +55,7 @@ export default function AddProcessingBatchPage() {
   const currentStepConfig = steps.find((s) => s.id === activeStep);
 
   const getFirstErrorMessage = (
-    errors: Partial<Readonly<FieldErrorsImpl<any>>>,
+    errors: Partial<Readonly<FieldErrorsImpl<any>>>
   ): string | undefined => {
     if (errors.crop && typeof errors.crop.message === "string")
       return errors.crop.message;
@@ -66,7 +66,7 @@ export default function AddProcessingBatchPage() {
       (key) =>
         errors[key] &&
         typeof errors[key]?.message === "string" &&
-        !errors[key]?.ref,
+        !errors[key]?.ref
     );
     if (
       refineErrorKey &&
@@ -84,11 +84,11 @@ export default function AddProcessingBatchPage() {
         const isValid = await currentStepForm.trigger();
         if (!isValid) {
           const firstError = getFirstErrorMessage(
-            currentStepForm.formState.errors,
+            currentStepForm.formState.errors
           );
           toast.error(
             firstError ||
-              "Please provide valid criteria (at least Crop or Lot No).",
+              "Please provide valid criteria (at least Crop or Lot No)."
           ); // Updated message
           return;
         }
@@ -119,7 +119,7 @@ export default function AddProcessingBatchPage() {
       if (!isValid) {
         toast.error(
           getFirstErrorMessage(currentStepForm.formState.errors) ||
-            "Please fill in all required P1 details.",
+            "Please fill in all required P1 details."
         );
         return;
       }
@@ -177,7 +177,7 @@ export default function AddProcessingBatchPage() {
         !lockedProcuredForm
       ) {
         toast.error(
-          "Batch criteria (Crop, Lot No, Procured Form) are not fully determined. Please select procurements.",
+          "Batch criteria (Crop, Lot No, Procured Form) are not fully determined. Please select procurements."
         );
         setIsSubmitting(false);
         return;
@@ -206,7 +206,7 @@ export default function AddProcessingBatchPage() {
         router.push("/processing-batches");
       } else {
         throw new Error(
-          response.data.error || "Failed to create processing batch",
+          response.data.error || "Failed to create processing batch"
         );
       }
     } catch (error) {

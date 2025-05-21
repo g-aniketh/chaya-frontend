@@ -113,7 +113,7 @@ export function AddDryingDialog({
             parseFloat(quantityToSet.toFixed(2))
           );
         } catch (error) {
-          const err = error as any;
+          const err = error as AxiosError<{ error?: string }>;
           const errorMessage =
             err.response?.data?.error ||
             err.message ||
@@ -134,8 +134,6 @@ export function AddDryingDialog({
   const onSubmit = async (data: CreateDryingEntryInput) => {
     setIsSubmitting(true);
     try {
-      // The data object here is already typed correctly by RHF and Zod
-      // The API proxy will handle stringifying the body.
       await axios.post(
         `/api/processing-stages/${processingStageId}/drying`,
         data,
@@ -144,10 +142,9 @@ export function AddDryingDialog({
       toast.success(`Drying data for Day ${data.day} added successfully.`);
       onSuccess(); // Refresh table
       onOpenChange(false); // Close current dialog
-      // No need to reset form values for 'nextDay' here; useEffect will handle it if dialog re-opens.
     } catch (error) {
       console.error("Error adding drying data:", error);
-      const err = error as AxiosError<{ error?: string; details?: any[] }>;
+      const err = error as AxiosError<{ error?: string; details?: Array<{ path: string[]; message: string }> }>;
       let errorMessage = "Failed to add drying data";
       if (err.response?.data?.error) {
         errorMessage = err.response.data.error;
@@ -155,7 +152,7 @@ export function AddDryingDialog({
         errorMessage = err.message;
       }
       const errorDetails = err.response?.data?.details
-        ?.map((d: any) => `${d.path.join(".")}: ${d.message}`)
+        ?.map((d) => `${d.path.join(".")}: ${d.message}`)
         .join("; ");
       toast.error(errorMessage, { description: errorDetails });
     } finally {

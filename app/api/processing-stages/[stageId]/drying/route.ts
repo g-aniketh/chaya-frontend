@@ -1,4 +1,3 @@
-/*eslint-disable */
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,7 +5,8 @@ const getBackendUrl = (path: string): string => {
   const baseUrl = (
     process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
   ).replace(/\/$/, "");
-  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+  const normalizedPath = path.startsWith("/") ? path : "/" + path;
+  return baseUrl + normalizedPath;
 };
 
 interface Context {

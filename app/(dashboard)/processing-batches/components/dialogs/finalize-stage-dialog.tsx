@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-// Backend type from shared package might have a different date format (string vs Date)
-// For client form, it's often easier to work with Date objects.
-// We will transform to string only on submission if needed.
 
 import {
   Dialog,
@@ -37,7 +34,6 @@ import { cn } from "@/lib/utils";
 import { format, isValid as isDateValid } from "date-fns";
 import { toast } from "sonner";
 import { getDryingEntriesForStage } from "../../lib/actions";
-import { AxiosError } from "axios";
 
 const finalizeStageFormSchema = z.object({
   dateOfCompletion: z.date({
@@ -153,7 +149,7 @@ export function FinalizeStageDialog({
           result.error ||
           `Failed to finalize stage. Status: ${response.status}`;
         const errorDetails = result.details
-          ?.map((d: any) => `${d.path.join(".")}: ${d.message}`)
+          ?.map((d: { path: string[]; message: string }) => `${d.path.join(".")}: ${d.message}`)
           .join("; ");
         throw new Error(
           errorDetails ? `${errorMsg} - ${errorDetails}` : errorMsg

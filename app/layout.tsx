@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import { ThemeProvider } from "./providers/theme-provider";
 export const metadata: Metadata = {
@@ -20,7 +21,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {children} 
+          <Analytics/>
         </ThemeProvider>
       </body>
     </html>

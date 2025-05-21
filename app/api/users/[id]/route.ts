@@ -2,15 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-interface Params {
-  id: string;
-}
-
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params },
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const appSessionToken = request.cookies.get("app_session_token")?.value;
 
   if (!appSessionToken) {
@@ -55,11 +51,9 @@ export async function DELETE(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Params },
-) {
-  const { id } = params;
+// For the PUT function, let's try without explicit type annotations
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const appSessionToken = request.cookies.get("app_session_token")?.value;
 
   if (!appSessionToken) {

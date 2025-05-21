@@ -2,15 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-interface Params {
-  id: string;
-}
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Params },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = params;
+  const { id } = await params;
   const appSessionToken = request.cookies.get("app_session_token")?.value;
 
   if (!appSessionToken) {

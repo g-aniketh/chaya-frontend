@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (!backendResponse.ok) {
       return NextResponse.json(
-        { message: data.message || data.error || "Failed to fetch users" },
+        { message: data.message ?? data.error ?? "Failed to fetch users" },
         { status: backendResponse.status },
       );
     }

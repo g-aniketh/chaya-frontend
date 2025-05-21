@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -57,6 +57,14 @@ interface User {
   lastLoginAt: string | null;
   createdAt: string;
   updatedAt?: string | Date;
+}
+
+interface ErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 }
 
 export function StaffTable() {
@@ -117,29 +125,6 @@ export function StaffTable() {
     setIsEditDialogOpen(true);
   };
 
-  // const handleSaveEdit = async (updatedUserData: Partial<User>) => {
-  //   if (!editingUser) return;
-  //   try {
-  //     const response = await axios.put(
-  //       `/api/users/${editingUser.id}`,
-  //       updatedUserData,
-  //     );
-  //     toast.success("Staff member updated successfully.");
-  //     setUsers((prevUsers) =>
-  //       prevUsers.map((u) =>
-  //         u.id === editingUser.id ? { ...u, ...response.data.user } : u,
-  //       ),
-  //     );
-  //     setIsEditDialogOpen(false);
-  //     setEditingUser(null);
-  //   } catch (error: any) {
-  //     console.error("Error updating user:", error);
-  //     toast.error(
-  //       error.response?.data?.message || "Failed to update staff member.",
-  //     );
-  //   }
-  // };
-
   const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
     setIsDeleteDialogOpen(true);
@@ -147,17 +132,19 @@ export function StaffTable() {
 
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
+
     try {
       await axios.delete(`/api/users/${userToDelete.id}`);
       toast.success("Staff member deleted successfully.");
       setUsers((prevUsers) =>
         prevUsers.filter((user) => user.id !== userToDelete.id),
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as ErrorResponse)?.response?.data?.message ||
+        "Failed to delete staff member.";
       console.error("Error deleting user:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to delete staff member.",
-      );
+      toast.error(errorMessage);
     } finally {
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
@@ -183,16 +170,15 @@ export function StaffTable() {
           u.id === userToToggle.id ? { ...u, ...response.data.user } : u,
         ),
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as ErrorResponse)?.response?.data?.message ||
+        "Failed to update staff member status.";
       console.error("Error toggling user status:", error);
       setUsers(originalUsers);
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to update staff member status.",
-      );
+      toast.error(errorMessage);
     }
   };
-
   return (
     <div className="space-y-4">
       <div className="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

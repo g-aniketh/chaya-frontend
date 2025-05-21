@@ -10,7 +10,7 @@ interface PageProps {
   searchParams?: Promise<{
     query?: string;
     page?: string;
-    status?: string; // For filtering by latest stage status
+    status?: string;
   }>;
 }
 

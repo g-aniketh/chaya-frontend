@@ -12,7 +12,6 @@ import { FirstStageDetailsStep } from "./components/first-stage-details-step";
 import { ReviewAndSubmitStep } from "./components/review-submit-step";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
 import type { FieldErrorsImpl } from "react-hook-form";
 
 export default function AddProcessingBatchPage() {
@@ -185,7 +184,7 @@ export default function AddProcessingBatchPage() {
 
       const payload = {
         crop: lockedCrop,
-        lotNo: lockedLotNo, // Already ensured it's a number in previous step's logic if it came from form
+        lotNo: lockedLotNo,
         procurementIds: selectedProcurementIds,
         firstStageDetails: {
           processMethod: firstStageDetails.processMethod,
@@ -194,31 +193,26 @@ export default function AddProcessingBatchPage() {
         },
       };
 
-      const response = await axios.post("/api/processing-batches", payload, {
-        withCredentials: true,
+      const response = await fetch("/api/processing-batches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+
+      const data = await response.json();
 
       if (response.status === 201) {
         toast.success("Processing Batch created successfully!");
-        const dataChangedEvent = new CustomEvent("processingBatchDataChanged");
-        document.dispatchEvent(dataChangedEvent);
+        document.dispatchEvent(new CustomEvent("processingBatchDataChanged"));
         resetForm();
         router.push("/processing-batches");
       } else {
-        throw new Error(
-          response.data.error || "Failed to create processing batch"
-        );
+        throw new Error(data.error || "Failed to create processing batch");
       }
     } catch (error) {
       console.error("Error creating processing batch:", error);
       const errorMsg =
-        error instanceof AxiosError
-          ? error.response?.data?.details?.[0]?.message ||
-            error.response?.data?.error ||
-            error.message
-          : error instanceof Error
-            ? error.message
-            : "Something went wrong";
+        error instanceof Error ? error.message : "Something went wrong";
       toast.error(`Error: ${errorMsg}`);
     } finally {
       setIsSubmitting(false);

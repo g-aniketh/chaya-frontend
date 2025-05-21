@@ -97,7 +97,7 @@ export function ProcurementForm({
         time: format(new Date(initialData.time), "HH:mm:ss"),
         lotNo: initialData.lotNo,
         procuredBy: initialData.procuredBy,
-        vehicleNo: initialData.vehicleNo || "",
+        vehicleNo: initialData.vehicleNo ?? "",
       });
     } else if (mode === "add") {
       methods.reset({
@@ -139,7 +139,7 @@ export function ProcurementForm({
         }).then(async (res) => {
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error || "Failed to add procurement");
+            throw new Error(errorData.error ?? "Failed to add procurement");
           }
           return res.json();
         });
@@ -158,8 +158,8 @@ export function ProcurementForm({
       if (error instanceof AxiosError) {
         const errorDetails = error.response?.data?.details;
         let errorMessage =
-          error.response?.data?.error ||
-          error.message ||
+          error.response?.data?.error ??
+          error.message ??
           "Something went wrong";
 
         if (errorDetails && Array.isArray(errorDetails)) {

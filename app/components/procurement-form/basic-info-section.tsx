@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useFormContext, Controller } from "react-hook-form"; // Use useFormContext
+import { useFormContext, Controller } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
-import axios from "axios";
 import { toast } from "sonner";
-import type { ProcurementFullFormValues } from "@/app/stores/procurement-form"; // Import the full form type
+import type { ProcurementFullFormValues } from "@/app/stores/procurement-form";
 
 interface Farmer {
   id: number;
@@ -40,20 +39,18 @@ export function BasicInfoSection() {
     formState: { errors },
     setValue,
     watch,
-  } = useFormContext<ProcurementFullFormValues>(); // Use context
-  const BACKEND_API_URL =
-    process.env.PROD_BACKEND_URL || "http://localhost:5000";
+  } = useFormContext<ProcurementFullFormValues>();
 
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [isLoadingFarmers, setIsLoadingFarmers] = useState(false);
 
-  const watchedCrop = watch("crop"); // Watch from the shared form context
+  const watchedCrop = watch("crop");
 
   useEffect(() => {
     if (watchedCrop) {
       const currentProcuredFormsForNewCrop =
         PROCURED_FORMS_BY_CROP[watchedCrop as CropType] || [];
-      const currentProcuredFormValue = control._formValues.procuredForm; // Access current value directly
+      const currentProcuredFormValue = control._formValues.procuredForm;
 
       if (
         currentProcuredFormValue &&
@@ -73,11 +70,11 @@ export function BasicInfoSection() {
     const fetchFarmers = async () => {
       setIsLoadingFarmers(true);
       try {
-        const response = await axios.get(`${BACKEND_API_URL}/api/farmers`, {
-          params: { limit: 1000, isActive: true },
-          withCredentials: true,
+        const response = await fetch(`/api/farmers?limit=1000&isActive=true`, {
+          credentials: "include",
         });
-        setFarmers(response.data.farmers);
+        const data = await response.json();
+        setFarmers(data.farmers);
       } catch (error) {
         console.error("Error fetching farmers:", error);
         toast.error("Failed to load farmers. Please try again.");
@@ -86,7 +83,7 @@ export function BasicInfoSection() {
       }
     };
     fetchFarmers();
-  }, [BACKEND_API_URL]);
+  }, []);
 
   const currentProcuredForms = watchedCrop
     ? PROCURED_FORMS_BY_CROP[watchedCrop as CropType] || []
@@ -130,8 +127,7 @@ export function BasicInfoSection() {
               render={({ field }) => (
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value ?? ""} // Ensure value is passed for controlled Select
-                  // defaultValue={field.value} // Not needed if value is passed
+                  value={field.value ?? ""}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select crop" />
@@ -158,7 +154,7 @@ export function BasicInfoSection() {
               render={({ field }) => (
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value ?? ""} // Ensure value is passed
+                  value={field.value ?? ""}
                   disabled={!watchedCrop || currentProcuredForms.length === 0}
                 >
                   <SelectTrigger>

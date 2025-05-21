@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
       // unless your Fastify backend specifically requires cookies from this proxy,
       // which is unlikely for a login endpoint.
     });
-
+    console.log(
+      "Backend Set-Cookieader:",
+      backendResponse.headers.get("Set-Cookie"),
+    );
     const backendData = await backendResponse.json();
 
     if (!backendResponse.ok) {

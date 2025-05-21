@@ -1,77 +1,66 @@
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-const getBackendUrl = (path: string): string => {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-  ).replace(/\/$/, "");
-  const normalizedPath = path.startsWith("/") ? path : "/" + path;
-  return baseUrl + normalizedPath;
-};
+const BACKEND_API_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
 
-interface Context {
-  params: {
-    stageId: string;
-  };
-}
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ stageId: string }> }
+) {
+  const { stageId } = await params;
+  const token = request.cookies.get("token")?.value;
 
-export async function POST(request: NextRequest, context: Context) {
-  const { stageId } = context.params;
+  if (!token) {
+    return NextResponse.json(
+      { message: "Unauthorized: Missing token" },
+      { status: 401 }
+    );
+  }
+
+  if (!BACKEND_API_URL) {
+    return NextResponse.json(
+      { message: "Backend service URL not configured" },
+      { status: 500 }
+    );
+  }
+
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    if (!token) {
-      return new NextResponse(
-        JSON.stringify({ error: "Authentication required" }),
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
-    const response = await fetch(
-      getBackendUrl(`/api/processing-stages/${stageId}/drying`),
+
+    const backendResponse = await fetch(
+      `${BACKEND_API_URL}api/processing-stages/${stageId}/drying`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: `token=${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       }
     );
 
-    const responseData = await response.json().catch(() => null);
+    const data = await backendResponse.json().catch(() => null);
 
-    if (!response.ok) {
-      const errorText =
-        responseData?.error ||
-        (await response.text().catch(() => "Unknown backend error"));
-      console.error(
-        `Backend error for /api/processing-stages/${stageId}/drying: ${response.status} - ${errorText}`,
-        responseData?.details
-      );
-      return new NextResponse(
-        JSON.stringify({
-          error: responseData?.error || `Backend error: ${response.statusText}`,
-          details: responseData?.details || errorText,
-        }),
+    if (!backendResponse.ok) {
+      return NextResponse.json(
         {
-          status: response.status,
-        }
+          message:
+            data?.message ||
+            data?.error ||
+            `Backend error: ${backendResponse.statusText}`,
+          details: data?.details,
+        },
+        { status: backendResponse.status }
       );
     }
-    return new NextResponse(JSON.stringify(responseData), {
-      status: response.status,
-    });
+
+    return NextResponse.json(data, { status: backendResponse.status });
   } catch (error: unknown) {
-    console.error(
-      `Error in Next.js POST /api/processing-stages/${stageId}/drying:`,
-      error
-    );
     const errorMessage =
-      error instanceof Error ? error.message : "Internal server error";
-    return new NextResponse(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-    });
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { message: "Internal server error", errorMessage },
+      { status: 500 }
+    );
   }
 }

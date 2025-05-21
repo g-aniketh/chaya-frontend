@@ -1,67 +1,66 @@
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-// Ensure this matches the environment variable name you use for the backend URL
 const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
 
-interface Context {
-  params: {
-    batchId: string;
-  };
-}
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ batchId: string }> }
+) {
+  const { batchId } = await params;
+  const token = request.cookies.get("token")?.value;
 
-export async function DELETE(request: NextRequest, context: Context) {
-  const { batchId } = context.params;
+  if (!token) {
+    return NextResponse.json(
+      { message: "Unauthorized: Missing token" },
+      { status: 401 }
+    );
+  }
+
+  if (!BACKEND_API_URL) {
+    return NextResponse.json(
+      { message: "Backend service URL not configured" },
+      { status: 500 }
+    );
+  }
 
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
-
-    const backendRes = await fetch(
-      `${BACKEND_API_URL}/api/processing-batches/${batchId}`,
+    const backendResponse = await fetch(
+      `${BACKEND_API_URL}api/processing-batches/${batchId}`,
       {
         method: "DELETE",
         headers: {
-          // Forward necessary headers, backend might not need Content-Type for DELETE if no body
-          Cookie: `token=${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    // Backend might return no content on successful delete (204)
-    // or a success message (200 or 202)
-    if (backendRes.status === 204) {
+    if (backendResponse.status === 204) {
       return new NextResponse(null, { status: 204 });
     }
 
-    const data = await backendRes.json();
+    const data = await backendResponse.json();
 
-    if (!backendRes.ok) {
+    if (!backendResponse.ok) {
       return NextResponse.json(
         {
-          error: data.error ?? "Failed to delete processing batch on backend",
+          message:
+            data.message ||
+            data.error ||
+            "Failed to delete processing batch on backend",
           details: data.details,
         },
-        { status: backendRes.status }
+        { status: backendResponse.status }
       );
     }
 
-    return NextResponse.json(data, { status: backendRes.status });
-  } catch (error) {
-    console.error(
-      `Error in Next.js DELETE /api/processing-batches/${batchId} route:`,
-      error
-    );
+    return NextResponse.json(data, { status: backendResponse.status });
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { message: "Internal server error", errorMessage },
+      { status: 500 }
+    );
   }
 }

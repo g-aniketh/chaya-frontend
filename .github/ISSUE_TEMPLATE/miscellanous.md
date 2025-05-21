@@ -2,8 +2,8 @@
 name: Miscellaneous Issue
 about: For anything that doesn't fit the other templates
 title: "[MISC] "
-labels: ''
-assignees: ''
+labels: ""
+assignees: ""
 ---
 
 **Describe your issue or request**

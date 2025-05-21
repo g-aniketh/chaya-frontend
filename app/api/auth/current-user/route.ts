@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export async function GET(_request: NextRequest) {
-  const appSessionToken = _request.cookies.get("app_session_token")?.value;
+export async function GET(request: NextRequest) {
+  const appSessionToken = request.cookies.get("app_session_token")?.value;
 
   if (!appSessionToken) {
     return NextResponse.json(
@@ -36,8 +36,10 @@ export async function GET(_request: NextRequest) {
     }
 
     return NextResponse.json(backendData, { status: 200 });
-  } catch (error: any) {
-    console.error("Current user API route error:", error.message);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Current user API route error:", errorMessage);
     return NextResponse.json(
       { message: "An internal server error occurred." },
       { status: 500 },

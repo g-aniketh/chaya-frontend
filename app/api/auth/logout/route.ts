@@ -29,8 +29,10 @@ export async function POST(request: NextRequest) {
         },
       });
       console.log("Called backend logout successfully.");
-    } catch (error) {
-      console.error("Error calling backend logout:", error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error calling backend logout:", errorMessage);
     }
   } else {
     console.log(

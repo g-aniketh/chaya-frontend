@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const response = await fetch(`${BACKEND_URL}/api/processing-stages`, {
+    const response = await fetch(`${BACKEND_URL}api/processing-stages`, {
       // Matches backend route for creating stages
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: `token=${token}` },

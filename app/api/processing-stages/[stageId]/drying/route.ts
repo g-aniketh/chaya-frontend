@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, context: any) {
 
     const body = await request.json();
     const response = await fetch(
-      `${BACKEND_URL}/api/processing-stages/${stageId}/drying`,
+      `${BACKEND_URL}api/processing-stages/${stageId}/drying`,
       {
         method: "POST",
         headers: {

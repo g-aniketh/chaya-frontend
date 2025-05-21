@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const backendRes = await fetch(`${BACKEND_URL}/api/processing-batches`, {
+    const backendRes = await fetch(`${BACKEND_URL}api/processing-batches`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

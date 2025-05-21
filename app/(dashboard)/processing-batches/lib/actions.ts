@@ -27,7 +27,7 @@ export async function getProcessingBatchDetailsById(
       throw new Error("Authentication required");
     }
 
-    const fetchURL = `${BACKEND_API_URL}/api/processing-batches/${batchId}`;
+    const fetchURL = `${BACKEND_API_URL}api/processing-batches/${batchId}`;
     const response = await fetch(fetchURL, {
       method: "GET",
       headers: {
@@ -72,7 +72,7 @@ export async function getDryingEntriesForStage(
     }
 
     const response = await fetch(
-      `${BACKEND_API_URL}/api/processing-stages/${stageId}/drying`,
+      `${BACKEND_API_URL}api/processing-stages/${stageId}/drying`,
       {
         method: "GET",
         headers: { Cookie: `token=${token}` },

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { type FinalizeProcessingStageInput as BackendFinalizeProcessingStageInputType } from "@fyzanshaik/chaya-prisma-package";
 
 import {
   Dialog,
@@ -32,24 +31,22 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isValid as isDateValid } from "date-fns";
 import { toast } from "sonner";
-import {
-  finalizeProcessingStageAction,
-  getDryingEntriesForStage,
-} from "../../lib/actions";
+import { getDryingEntriesForStage } from "../../lib/actions";
 
 const finalizeStageFormSchema = z.object({
   dateOfCompletion: z.date({
     required_error: "Date of Completion is required",
     invalid_type_error: "That's not a valid date!",
   }),
-  quantityAfterProcess: z.coerce
+  quantityAfterProcess: z.coerce // Use coerce for better UX with number inputs
     .number({
       required_error: "Final quantity is required",
       invalid_type_error: "Final quantity must be a number",
     })
-    .positive("Final quantity must be a positive number"),
+    .positive("Final quantity must be a positive number")
+    .min(0.01, "Quantity must be greater than 0"),
 });
 
 type FinalizeStageFormValues = z.infer<typeof finalizeStageFormSchema>;
@@ -58,7 +55,7 @@ interface FinalizeStageDialogProps {
   processingStageId: number;
   batchCode: string;
   processingCount: number;
-  currentInitialQuantity: number;
+  currentInitialQuantity: number; // Initial quantity of this stage
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -80,7 +77,7 @@ export function FinalizeStageDialog({
     resolver: zodResolver(finalizeStageFormSchema),
     defaultValues: {
       dateOfCompletion: new Date(),
-      quantityAfterProcess: undefined,
+      quantityAfterProcess: undefined, // Start undefined, will be autofilled
     },
   });
 
@@ -89,9 +86,15 @@ export function FinalizeStageDialog({
       setIsLoadingDrying(true);
       getDryingEntriesForStage(processingStageId)
         .then((dryingEntries) => {
-          const latestDryingEntry = dryingEntries?.sort(
-            (a, b) => b.day - a.day
-          )[0];
+          // Ensure dryingEntries is an array before proceeding
+          const validEntries = Array.isArray(dryingEntries)
+            ? dryingEntries
+            : [];
+          const latestDryingEntry =
+            validEntries.length > 0
+              ? validEntries.sort((a, b) => b.day - a.day)[0]
+              : null;
+
           const autoFillQuantity =
             latestDryingEntry?.currentQuantity ?? currentInitialQuantity;
 
@@ -107,6 +110,7 @@ export function FinalizeStageDialog({
           );
           console.error("Error fetching drying entries for autofill:", err);
           form.reset({
+            // Fallback to initial quantity on error
             dateOfCompletion: new Date(),
             quantityAfterProcess:
               parseFloat(currentInitialQuantity.toFixed(2)) || undefined,
@@ -121,11 +125,37 @@ export function FinalizeStageDialog({
   const onSubmit = async (data: FinalizeStageFormValues) => {
     setIsSubmitting(true);
     try {
-      const payload: BackendFinalizeProcessingStageInputType = {
-        dateOfCompletion: data.dateOfCompletion,
+      // Ensure date is ISO string for backend Zod schema
+      const payloadForBackend = {
+        dateOfCompletion: data.dateOfCompletion.toISOString(),
         quantityAfterProcess: data.quantityAfterProcess,
       };
-      await finalizeProcessingStageAction(processingStageId, payload);
+
+      const response = await fetch(
+        `/api/processing-stages/${processingStageId}/finalize`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payloadForBackend),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMsg =
+          result.error ||
+          `Failed to finalize stage. Status: ${response.status}`;
+        const errorDetails = result.details
+          ?.map((d: { path: string[]; message: string }) => `${d.path.join(".")}: ${d.message}`)
+          .join("; ");
+        throw new Error(
+          errorDetails ? `${errorMsg} - ${errorDetails}` : errorMsg
+        );
+      }
+
       toast.success(
         `Stage P${processingCount} for Batch ${batchCode} finalized successfully.`
       );
@@ -135,9 +165,9 @@ export function FinalizeStageDialog({
     } catch (error) {
       console.error("Error finalizing stage:", error);
       if (error instanceof Error) {
-        toast.error(`Error: ${error.message || "Failed to finalize stage"}`);
+        toast.error(`Error: ${error.message}`);
       } else {
-        toast.error("Failed to finalize stage");
+        toast.error("Failed to finalize stage due to an unknown error.");
       }
     } finally {
       setIsSubmitting(false);
@@ -152,7 +182,7 @@ export function FinalizeStageDialog({
             Finalize Stage P{processingCount} for Batch {batchCode}
           </DialogTitle>
           <DialogDescription>
-            Enter the completion details. Initial quantity for this stage was{" "}
+            Enter the completion details. Initial stage quantity:{" "}
             {currentInitialQuantity.toFixed(2)}kg.
             {isLoadingDrying && " Fetching latest drying quantity..."}
           </DialogDescription>
@@ -175,7 +205,7 @@ export function FinalizeStageDialog({
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value ? (
+                          {field.value && isDateValid(field.value) ? (
                             format(field.value, "PPP")
                           ) : (
                             <span>Pick a date</span>
@@ -190,6 +220,7 @@ export function FinalizeStageDialog({
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        disabled={(date) => date > new Date()} // Prevent future dates
                       />
                     </PopoverContent>
                   </Popover>
@@ -209,6 +240,14 @@ export function FinalizeStageDialog({
                       step="0.01"
                       placeholder="Enter final yield for this stage"
                       {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === ""
+                            ? undefined
+                            : parseFloat(e.target.value)
+                        )
+                      }
                       disabled={isLoadingDrying}
                     />
                   </FormControl>

@@ -11,7 +11,12 @@ import type {
   FinalizeProcessingStageInput,
 } from "@fyzanshaik/chaya-prisma-package";
 
-const BACKEND_API_URL = process.env.PROD_BACKEND_URL || "http://localhost:5000";
+const getBackendUrl = (path: string): string => {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+  ).replace(/\/$/, "");
+  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+};
 
 export async function getProcessingBatchDetailsById(
   batchId: number
@@ -27,7 +32,7 @@ export async function getProcessingBatchDetailsById(
       throw new Error("Authentication required");
     }
 
-    const fetchURL = `${BACKEND_API_URL}api/processing-batches/${batchId}`;
+    const fetchURL = getBackendUrl(`/api/processing-batches/${batchId}`);
     const response = await fetch(fetchURL, {
       method: "GET",
       headers: {
@@ -72,7 +77,7 @@ export async function getDryingEntriesForStage(
     }
 
     const response = await fetch(
-      `${BACKEND_API_URL}api/processing-stages/${stageId}/drying`,
+      getBackendUrl(`/api/processing-stages/${stageId}/drying`),
       {
         method: "GET",
         headers: { Cookie: `token=${token}` },
@@ -80,6 +85,10 @@ export async function getDryingEntriesForStage(
     );
     const data = await response.json();
     if (!response.ok) {
+      console.error(
+        `Backend error fetching drying entries for stage ${stageId}:`,
+        data
+      );
       throw new Error(data.error || "Failed to fetch drying entries");
     }
     return data.dryingEntries || [];
@@ -122,7 +131,7 @@ export async function getProcessingBatchesList(params: {
     }
 
     const response = await fetch(
-      `${BACKEND_API_URL}/api/processing-batches?${searchParams.toString()}`,
+      getBackendUrl(`/api/processing-batches?${searchParams.toString()}`),
       {
         method: "GET",
         headers: { Cookie: `token=${token}` },
@@ -164,15 +173,20 @@ export async function finalizeProcessingStageAction(
       throw new Error("Authentication required");
     }
 
+    const payloadForBackend = {
+      ...payload,
+      dateOfCompletion: new Date(payload.dateOfCompletion).toISOString(),
+    };
+
     const response = await fetch(
-      `${BACKEND_API_URL}/api/processing-stages/${stageId}/finalize`,
+      getBackendUrl(`/api/processing-stages/${stageId}/finalize`),
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Cookie: `token=${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payloadForBackend),
       }
     );
 

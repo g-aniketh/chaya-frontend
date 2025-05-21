@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { AxiosError } from "axios"; // Keep axios for its conciseness in client components
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -38,12 +38,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getDryingEntriesForStage } from "../../lib/actions";
-import { AxiosError } from "axios";
 
 interface AddDryingDialogProps {
   processingStageId: number;
   batchCode: string;
   processingCount: number;
+  stageInitialQuantity: number; // Added this prop
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -53,6 +53,7 @@ export function AddDryingDialog({
   processingStageId,
   batchCode,
   processingCount,
+  stageInitialQuantity,
   open,
   onOpenChange,
   onSuccess,
@@ -65,20 +66,31 @@ export function AddDryingDialog({
 
   const form = useForm<CreateDryingEntryInput>({
     resolver: zodResolver(createDryingEntrySchema),
+    // Default values are important; currentQuantity will be updated in useEffect
     defaultValues: {
       processingStageId: processingStageId,
       day: 1,
-      temperature: 25,
-      humidity: 60,
-      pH: 7,
-      moisturePercentage: 15,
-      currentQuantity: 0,
+      temperature: 25, // Sensible default
+      humidity: 60, // Sensible default
+      pH: 7.0, // Sensible default
+      moisturePercentage: 15, // Sensible default
+      currentQuantity: parseFloat(stageInitialQuantity.toFixed(2)) || 0, // Initialize from prop
     },
   });
 
   useEffect(() => {
     if (open && processingStageId) {
-      form.setValue("processingStageId", processingStageId);
+      // Reset relevant fields upon opening/stageId change to ensure fresh defaults
+      form.reset({
+        processingStageId: processingStageId,
+        day: 1,
+        temperature: 25,
+        humidity: 60,
+        pH: 7.0,
+        moisturePercentage: 15,
+        currentQuantity: parseFloat(stageInitialQuantity.toFixed(2)) || 0, // Initial value for the first entry
+      });
+
       const fetchExistingEntries = async () => {
         setIsLoadingEntries(true);
         try {
@@ -87,34 +99,37 @@ export function AddDryingDialog({
           const nextDay =
             entries.length > 0 ? Math.max(...entries.map((d) => d.day)) + 1 : 1;
           form.setValue("day", nextDay);
-          const lastEntry = entries.sort(
-            (a: { day: number }, b: { day: number }) => b.day - a.day
-          )[0];
+
+          const lastEntry =
+            entries.length > 0
+              ? entries.sort((a, b) => b.day - a.day)[0]
+              : null;
+
+          const quantityToSet = lastEntry
+            ? lastEntry.currentQuantity
+            : stageInitialQuantity;
           form.setValue(
             "currentQuantity",
-            lastEntry ? lastEntry.currentQuantity : 0
+            parseFloat(quantityToSet.toFixed(2))
           );
         } catch (error) {
-          if (error instanceof AxiosError) {
-            toast.error(
-              error.response?.data?.error ||
-                error.message ||
-                "Failed to load existing drying entries."
-            );
-          } else if (error instanceof Error) {
-            toast.error(
-              error.message || "Failed to load existing drying entries."
-            );
-          } else {
-            toast.error("Failed to load existing drying entries.");
-          }
+          const err = error as AxiosError<{ error?: string }>;
+          const errorMessage =
+            err.response?.data?.error ||
+            err.message ||
+            "Failed to load existing drying entries.";
+          toast.error(errorMessage);
+          form.setValue(
+            "currentQuantity",
+            parseFloat(stageInitialQuantity.toFixed(2))
+          );
         } finally {
           setIsLoadingEntries(false);
         }
       };
       fetchExistingEntries();
     }
-  }, [open, processingStageId, form]);
+  }, [open, processingStageId, form, stageInitialQuantity]); // stageInitialQuantity dependency
 
   const onSubmit = async (data: CreateDryingEntryInput) => {
     setIsSubmitting(true);
@@ -125,26 +140,21 @@ export function AddDryingDialog({
         { withCredentials: true }
       );
       toast.success(`Drying data for Day ${data.day} added successfully.`);
-      onSuccess();
-      onOpenChange(false);
-      const nextDay = data.day + 1;
-      form.reset({
-        ...form.formState.defaultValues,
-        day: nextDay,
-        processingStageId,
-        currentQuantity: data.currentQuantity,
-      });
+      onSuccess(); // Refresh table
+      onOpenChange(false); // Close current dialog
     } catch (error) {
       console.error("Error adding drying data:", error);
-      if (error instanceof AxiosError) {
-        toast.error(
-          `Error: ${error.response?.data?.error || error.message || "Failed to add drying data"}`
-        );
-      } else if (error instanceof Error) {
-        toast.error(`Error: ${error.message || "Failed to add drying data"}`);
-      } else {
-        toast.error("Failed to add drying data");
+      const err = error as AxiosError<{ error?: string; details?: Array<{ path: string[]; message: string }> }>;
+      let errorMessage = "Failed to add drying data";
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
       }
+      const errorDetails = err.response?.data?.details
+        ?.map((d) => `${d.path.join(".")}: ${d.message}`)
+        .join("; ");
+      toast.error(errorMessage, { description: errorDetails });
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +168,8 @@ export function AddDryingDialog({
             Add Drying Data for Batch {batchCode} - P{processingCount}
           </DialogTitle>
           <DialogDescription>
-            Enter the drying parameters for the specified day.
+            Enter the drying parameters for the specified day. Stage P
+            {processingCount} started with {stageInitialQuantity.toFixed(2)}kg.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -174,8 +185,13 @@ export function AddDryingDialog({
                       <Input
                         type="number"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseInt(e.target.value, 10) || 0)
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseInt(e.target.value, 10)
+                          )
                         }
                       />
                     </FormControl>
@@ -194,8 +210,13 @@ export function AddDryingDialog({
                         type="number"
                         step="0.1"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value)
+                          )
                         }
                       />
                     </FormControl>
@@ -214,8 +235,13 @@ export function AddDryingDialog({
                         type="number"
                         step="0.1"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value)
+                          )
                         }
                       />
                     </FormControl>
@@ -234,8 +260,13 @@ export function AddDryingDialog({
                         type="number"
                         step="0.1"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value)
+                          )
                         }
                       />
                     </FormControl>
@@ -254,8 +285,13 @@ export function AddDryingDialog({
                         type="number"
                         step="0.1"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value)
+                          )
                         }
                       />
                     </FormControl>
@@ -272,10 +308,15 @@ export function AddDryingDialog({
                     <FormControl>
                       <Input
                         type="number"
-                        step="0.5"
+                        step="0.01"
                         {...field}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseFloat(e.target.value)
+                          )
                         }
                       />
                     </FormControl>
@@ -318,20 +359,26 @@ export function AddDryingDialog({
                     <TableHead>Hum</TableHead>
                     <TableHead>pH</TableHead>
                     <TableHead>Moist%</TableHead>
-                    <TableHead>Qty(kg)</TableHead>
+                    <TableHead className="text-right">Qty(kg)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {existingDryingEntries.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell>{entry.day}</TableCell>
-                      <TableCell>{entry.temperature}°C</TableCell>
-                      <TableCell>{entry.humidity}%</TableCell>
-                      <TableCell>{entry.pH}</TableCell>
-                      <TableCell>{entry.moisturePercentage}%</TableCell>
-                      <TableCell>{entry.currentQuantity}kg</TableCell>
-                    </TableRow>
-                  ))}
+                  {existingDryingEntries.map(
+                    (
+                      entry // Should already be sorted by day 'asc' from action
+                    ) => (
+                      <TableRow key={entry.id}>
+                        <TableCell>{entry.day}</TableCell>
+                        <TableCell>{entry.temperature}°C</TableCell>
+                        <TableCell>{entry.humidity}%</TableCell>
+                        <TableCell>{entry.pH}</TableCell>
+                        <TableCell>{entry.moisturePercentage}%</TableCell>
+                        <TableCell className="text-right">
+                          {entry.currentQuantity.toFixed(2)}kg
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
                 </TableBody>
               </Table>
             </ScrollArea>

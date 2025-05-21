@@ -1,7 +1,12 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.PROD_BACKEND_URL ?? "http://localhost:5000";
+const getBackendUrl = (path: string): string => {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+  ).replace(/\/$/, "");
+  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const backendRes = await fetch(`${BACKEND_URL}api/processing-batches`, {
+    const backendRes = await fetch(getBackendUrl("/api/processing-batches"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,13 +31,18 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    const data = await backendRes.json();
+    const data = await backendRes.json().catch(() => null); // Handle potential non-JSON responses
 
     if (!backendRes.ok) {
+      console.error(
+        "Backend error creating processing batch:",
+        backendRes.status,
+        data
+      );
       return NextResponse.json(
         {
-          error: data.error ?? "Failed to create processing batch on backend",
-          details: data.details,
+          error: data?.error ?? "Failed to create processing batch on backend",
+          details: data?.details,
         },
         { status: backendRes.status }
       );
@@ -44,9 +54,8 @@ export async function POST(request: NextRequest) {
       "Error in Next.js POST /api/processing-batches route:",
       error
     );
-    return NextResponse.json(
-      { error: "Internal server error in Next.js API" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

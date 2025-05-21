@@ -21,15 +21,13 @@ export default function AddProcessingBatchPage() {
     goToNextStep,
     goToPreviousTab,
     setInitialCriteria,
-    // initialCrop, // Use initial for criteria step
-    // initialLotNo, // Use initial for criteria step
     selectedProcurementIds,
     firstStageDetails,
     isSubmitting,
     setIsSubmitting,
     resetForm,
     form: currentStepForm,
-    lockedCrop, // Use locked values for submission and later steps
+    lockedCrop,
     lockedLotNo,
     lockedProcuredForm,
   } = useProcessingBatchFormStore();
@@ -60,7 +58,6 @@ export default function AddProcessingBatchPage() {
       return errors.crop.message;
     if (errors.lotNo && typeof errors.lotNo.message === "string")
       return errors.lotNo.message;
-    // Check for schema level refine error (which might not have a specific field path if path is ["_error"] or just one path is given in refine)
     const refineErrorKey = Object.keys(errors).find(
       (key) =>
         errors[key] &&
@@ -88,11 +85,10 @@ export default function AddProcessingBatchPage() {
           toast.error(
             firstError ||
               "Please provide valid criteria (at least Crop or Lot No)."
-          ); // Updated message
+          );
           return;
         }
         const criteriaValues = currentStepForm.getValues();
-        // criteriaValues.crop and criteriaValues.lotNo can be null/undefined here
         setInitialCriteria({
           crop: criteriaValues.crop || null,
           lotNo:
@@ -101,7 +97,6 @@ export default function AddProcessingBatchPage() {
               : null,
         });
       } else {
-        // This case should ideally not be hit if setForm works correctly
         setInitialCriteria({ crop: null, lotNo: null });
       }
     }
@@ -188,7 +183,7 @@ export default function AddProcessingBatchPage() {
         procurementIds: selectedProcurementIds,
         firstStageDetails: {
           processMethod: firstStageDetails.processMethod,
-          dateOfProcessing: p1DateString,
+          dateOfProcessing: p1DateString, // Ensure this is an ISO string
           doneBy: firstStageDetails.doneBy,
         },
       };
@@ -207,13 +202,22 @@ export default function AddProcessingBatchPage() {
         resetForm();
         router.push("/processing-batches");
       } else {
-        throw new Error(data.error || "Failed to create processing batch");
+        // Improved error message display
+        const errorMessage = data.error || "Failed to create processing batch";
+        const errorDetails = data.details
+          ? data.details
+              .map((d: any) => `${d.path.join(".")}: ${d.message}`)
+              .join(", ")
+          : null;
+        toast.error(errorMessage, {
+          description: errorDetails,
+        });
       }
     } catch (error) {
       console.error("Error creating processing batch:", error);
       const errorMsg =
         error instanceof Error ? error.message : "Something went wrong";
-      toast.error(`Error: ${errorMsg}`);
+      toast.error(`Client-side error: ${errorMsg}`);
     } finally {
       setIsSubmitting(false);
     }

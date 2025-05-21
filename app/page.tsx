@@ -60,6 +60,11 @@ export default function Home() {
     const checkAuth = async () => {
       try {
         const response = await fetch("/api/auth/current-user");
+        if (response.status === 401) {
+          setIsAuthenticated(false);
+          setError(null);
+          return;
+        }
         if (!response.ok) {
           throw new Error("Authentication check failed");
         }

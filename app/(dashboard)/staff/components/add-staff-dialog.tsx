@@ -31,8 +31,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const BACKEND_API_URL = process.env.PROD_BACKEND_URL || "http://localhost:5000";
-
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -53,13 +51,6 @@ export function AddStaffDialog({
   onOpenChange,
   onStaffAdded,
 }: AddStaffDialogProps) {
-  const axiosConfig = {
-    withCredentials: true,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
@@ -75,11 +66,7 @@ export function AddStaffDialog({
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await axios.post(
-        `${BACKEND_API_URL}/api/auth/register`,
-        data,
-        axiosConfig
-      );
+      await axios.post("/api/auth/register", data);
       toast.success("Staff member added successfully");
       form.reset();
       onOpenChange(false);

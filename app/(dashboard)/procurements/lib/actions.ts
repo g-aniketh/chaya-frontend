@@ -6,7 +6,7 @@ import type { ProcurementWithRelations } from "./types";
 import type { UpdateProcurementInput } from "@fyzanshaik/chaya-prisma-package";
 import type { ProcurementWithFarmerForStore } from "@/app/stores/processing-batch-form";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BACKEND_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 interface GetProcurementsParams {
   page?: number;

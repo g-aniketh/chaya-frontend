@@ -55,9 +55,8 @@ export function FarmerForm({
           "Content-Type": "application/json",
         },
       };
-
       const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_BACKEND_URL ?? "http://localhost:5000";
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
       if (mode === "add") {
         console.log("Doing a POST request to add a new farmer");

@@ -1,0 +1,13 @@
+name: Ping Endpoint
+
+on:
+  schedule:
+    - cron: '*/1 * * * *' 
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Curl your endpoint
+        run: curl -fsSL https://chaya-backend-y6ne.onrender.com/api/health

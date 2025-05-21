@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
     const backendData = await backendResponse.json();
 
     if (!backendResponse.ok) {
-      // Forward the error from the backend
       return NextResponse.json(
         {
           message:
@@ -55,9 +54,6 @@ export async function POST(request: NextRequest) {
         { status: backendResponse.status },
       );
     }
-
-    // 2. If backend login is successful, extract user data and the token
-    //    (ensure your Fastify backend now returns the token in the body)
     const { user, token: backendToken } = backendData;
 
     if (!user || !backendToken) {
@@ -70,20 +66,20 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-
-    // 3. Set a new HttpOnly cookie for the frontend domain
     const response = NextResponse.json({ user }, { status: 200 });
     response.cookies.set("app_session_token", backendToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
     return response;
   } catch (error: unknown) {
-    console.error("Login API route error:", error instanceof Error ? error.message : String(error));
-    // Avoid leaking detailed error messages unless intended
+    console.error(
+      "Login API route error:",
+      error instanceof Error ? error.message : String(error),
+    );
     return NextResponse.json(
       { message: "An internal server error occurred during login." },
       { status: 500 },

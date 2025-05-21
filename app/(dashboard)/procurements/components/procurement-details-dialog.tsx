@@ -26,128 +26,167 @@ export function ProcurementDetailsDialog({
 }: ProcurementDetailsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>
-            Procurement Details - {procurement.procurementNumber}
+      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <span>Procurement Details</span>
+            <span className="text-muted-foreground text-base">
+              - {procurement.procurementNumber}
+            </span>
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-grow mt-4 pr-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <ScrollArea className="flex-grow pr-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold">Item Information</h3>
-                <Separator className="my-2" />
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">
-                    Procurement No.:
-                  </span>
-                  <span>{procurement.procurementNumber}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Crop:
-                  </span>
-                  <span>{procurement.crop}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Procured Form:
-                  </span>
-                  <span>{procurement.procuredForm}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Speciality:
-                  </span>
-                  <span>{procurement.speciality}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Quantity:
-                  </span>
-                  <span>{procurement.quantity} kg</span>
-                  <span className="font-medium text-muted-foreground">
-                    Lot Number:
-                  </span>
-                  <span>{procurement.lotNo}</span>
+              <div className="bg-card rounded-lg border p-5 shadow-sm">
+                <h3 className="text-base font-semibold mb-3">
+                  Item Information
+                </h3>
+                <Separator className="mb-3" />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Procurement No.
+                    </span>
+                    <p className="font-medium truncate">
+                      {procurement.procurementNumber}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">Crop</span>
+                    <p className="font-medium">{procurement.crop}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Procured Form
+                    </span>
+                    <p className="font-medium">{procurement.procuredForm}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Speciality
+                    </span>
+                    <p className="font-medium">{procurement.speciality}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Quantity
+                    </span>
+                    <p className="font-medium">{procurement.quantity} kg</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Lot Number
+                    </span>
+                    <p className="font-medium">{procurement.lotNo}</p>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mt-4">
+              <div className="bg-card rounded-lg border p-5 shadow-sm">
+                <h3 className="text-base font-semibold mb-3">
                   Procurement Details
                 </h3>
-                <Separator className="my-2" />
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">
-                    Date:
-                  </span>
-                  <span>
-                    {format(new Date(procurement.date), "dd/MM/yyyy")}
-                  </span>
-                  <span className="font-medium text-muted-foreground">
-                    Time:
-                  </span>
-                  <span>{format(new Date(procurement.time), "hh:mm a")}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Procured By:
-                  </span>
-                  <span>{procurement.procuredBy}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Vehicle Number:
-                  </span>
-                  <span>{procurement.vehicleNo || "N/A"}</span>
+                <Separator className="mb-3" />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">Date</span>
+                    <p className="font-medium">
+                      {format(new Date(procurement.date), "dd/MM/yyyy")}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">Time</span>
+                    <p className="font-medium">
+                      {format(new Date(procurement.time), "hh:mm a")}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Procured By
+                    </span>
+                    <p className="font-medium">{procurement.procuredBy}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Vehicle Number
+                    </span>
+                    <p className="font-medium">
+                      {procurement.vehicleNo || "N/A"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold">Farmer Information</h3>
-                <Separator className="my-2" />
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">
-                    Name:
-                  </span>
-                  <span>{procurement.farmer.name}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Village:
-                  </span>
-                  <span>{procurement.farmer.village}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Panchayath:
-                  </span>
-                  <span>{procurement.farmer.panchayath}</span>
-                  <span className="font-medium text-muted-foreground">
-                    Mandal:
-                  </span>
-                  <span>{procurement.farmer.mandal}</span>
+              <div className="bg-card rounded-lg border p-5 shadow-sm">
+                <h3 className="text-base font-semibold mb-3">
+                  Farmer Information
+                </h3>
+                <Separator className="mb-3" />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">Name</span>
+                    <p className="font-medium">{procurement.farmer.name}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Village
+                    </span>
+                    <p className="font-medium">{procurement.farmer.village}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Panchayath
+                    </span>
+                    <p className="font-medium">
+                      {procurement.farmer.panchayath}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Mandal
+                    </span>
+                    <p className="font-medium">{procurement.farmer.mandal}</p>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mt-4">
+              <div className="bg-card rounded-lg border p-5 shadow-sm">
+                <h3 className="text-base font-semibold mb-3">
                   System Information
                 </h3>
-                <Separator className="my-2" />
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">
-                    Created At:
-                  </span>
-                  <span>
-                    {format(
-                      new Date(procurement.createdAt),
-                      "dd/MM/yyyy hh:mm a"
-                    )}
-                  </span>
-                  <span className="font-medium text-muted-foreground">
-                    Last Updated:
-                  </span>
-                  <span>
-                    {format(
-                      new Date(procurement.updatedAt),
-                      "dd/MM/yyyy hh:mm a"
-                    )}
-                  </span>
+                <Separator className="mb-3" />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Created At
+                    </span>
+                    <p className="font-medium">
+                      {format(
+                        new Date(procurement.createdAt),
+                        "dd/MM/yyyy hh:mm a"
+                      )}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      Last Updated
+                    </span>
+                    <p className="font-medium">
+                      {format(
+                        new Date(procurement.updatedAt),
+                        "dd/MM/yyyy hh:mm a"
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter className="mt-auto pt-4">
+        <DialogFooter className="mt-4 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>

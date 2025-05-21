@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const backendUrl =
       process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
-    const response = await fetch(`${backendUrl}/api/procurements`, {
+    const response = await fetch(`${backendUrl}api/procurements`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

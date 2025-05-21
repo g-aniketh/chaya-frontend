@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogDescription, // Keep the import
   DialogFooter,
 } from "@/components/ui/dialog";
 import type {
@@ -93,14 +93,17 @@ export function BatchDetailsDialog({
   const renderSkeleton = () => (
     <>
       <DialogHeader className="p-6 pb-4 border-b">
-        {" "}
-        {/* Ensure header is always present */}
         <DialogTitle>
           <Skeleton className="h-7 w-3/5 mb-1" />
         </DialogTitle>
-        <DialogDescription>
-          <Skeleton className="h-4 w-full mb-1" />
-          <Skeleton className="h-4 w-4/5" />
+        {/* Use div for DialogDescription content if it contains block elements */}
+        <DialogDescription asChild>
+          <div>
+            {" "}
+            {/* Wrap Skeleton in a div or use Fragment if it's the only child */}
+            <Skeleton className="h-4 w-full mb-1" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
         </DialogDescription>
       </DialogHeader>
       <ScrollArea className="flex-grow overflow-y-auto px-6 py-4">
@@ -169,10 +172,9 @@ export function BatchDetailsDialog({
         ) : !batch ? (
           <>
             <DialogHeader className="p-6 pb-2">
-              <DialogTitle>Error Loading Batch</DialogTitle>{" "}
-              {/* Always provide a title */}
-              <DialogDescription>
-                Could not load batch details. Please try again.
+              <DialogTitle>Error Loading Batch</DialogTitle>
+              <DialogDescription asChild>
+                <div>Could not load batch details. Please try again.</div>
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="p-6 pt-2 border-t">
@@ -185,34 +187,39 @@ export function BatchDetailsDialog({
           <>
             <DialogHeader className="p-6 pb-4 border-b">
               <DialogTitle>Batch Details: {batch.batchCode}</DialogTitle>
-              <DialogDescription className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm pt-1">
-                <span>
-                  Crop: <span className="font-semibold">{batch.crop}</span>
-                </span>
-                <Separator orientation="vertical" className="h-4" />
-                <span>
-                  Lot No: <span className="font-semibold">{batch.lotNo}</span>
-                </span>
-                <Separator orientation="vertical" className="h-4" />
-                <span>
-                  Created By:{" "}
-                  <span className="font-semibold">{batch.createdBy.name}</span>
-                </span>
-                <Separator orientation="vertical" className="h-4" />
-                <span>
-                  On:{" "}
-                  <span className="font-semibold">
-                    {format(new Date(batch.createdAt), "PP")}
+              {/* Use DialogDescription with asChild and a div wrapper */}
+              <DialogDescription asChild>
+                <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm pt-1">
+                  <span>
+                    Crop: <span className="font-semibold">{batch.crop}</span>
                   </span>
-                </span>
-                <Separator orientation="vertical" className="h-4" />
-                <span>Overall Status:</span>
-                <Badge
-                  variant={getStatusBadgeVariant(displayedOverallStatus)}
-                  className="ml-1"
-                >
-                  {displayedOverallStatus.toString().replace(/_/g, " ")}
-                </Badge>
+                  <Separator orientation="vertical" className="h-4" />
+                  <span>
+                    Lot No: <span className="font-semibold">{batch.lotNo}</span>
+                  </span>
+                  <Separator orientation="vertical" className="h-4" />
+                  <span>
+                    Created By:{" "}
+                    <span className="font-semibold">
+                      {batch.createdBy.name}
+                    </span>
+                  </span>
+                  <Separator orientation="vertical" className="h-4" />
+                  <span>
+                    On:{" "}
+                    <span className="font-semibold">
+                      {format(new Date(batch.createdAt), "PP")}
+                    </span>
+                  </span>
+                  <Separator orientation="vertical" className="h-4" />
+                  <span>Overall Status:</span>
+                  <Badge
+                    variant={getStatusBadgeVariant(displayedOverallStatus)}
+                    className="ml-1"
+                  >
+                    {displayedOverallStatus.toString().replace(/_/g, " ")}
+                  </Badge>
+                </div>
               </DialogDescription>
             </DialogHeader>
 
@@ -226,8 +233,7 @@ export function BatchDetailsDialog({
                     <div>
                       <span className="text-xs text-muted-foreground block">
                         Initial Batch Qty:
-                      </span>{" "}
-                      {/* Use span or div instead of p */}
+                      </span>
                       <span className="font-semibold block">
                         {batch.initialBatchQuantity.toFixed(2)} kg
                       </span>
@@ -293,7 +299,7 @@ export function BatchDetailsDialog({
                   ) : (
                     <div className="text-sm text-muted-foreground mt-2 text-center py-3">
                       No procurements linked.
-                    </div> // Use div
+                    </div>
                   )}
                 </div>
 
@@ -327,8 +333,7 @@ export function BatchDetailsDialog({
                               <div className="text-xs text-muted-foreground">
                                 Method: {stage.processMethod.toUpperCase()} |
                                 By: {stage.doneBy}
-                              </div>{" "}
-                              {/* Use div */}
+                              </div>
                             </div>
                             <div className="text-xs text-muted-foreground text-right">
                               <div>
@@ -337,8 +342,7 @@ export function BatchDetailsDialog({
                                   new Date(stage.dateOfProcessing),
                                   "dd/MM/yy HH:mm"
                                 )}
-                              </div>{" "}
-                              {/* Use div */}
+                              </div>
                               {stage.dateOfCompletion ? (
                                 <div>
                                   Completed:{" "}
@@ -358,8 +362,7 @@ export function BatchDetailsDialog({
                                 Initial Qty:
                               </span>{" "}
                               {stage.initialQuantity.toFixed(2)}kg
-                            </div>{" "}
-                            {/* Use div */}
+                            </div>
                             {stage.quantityAfterProcess !== null && (
                               <div>
                                 <span className="text-muted-foreground">
@@ -374,8 +377,7 @@ export function BatchDetailsDialog({
                             <div className="mt-1.5">
                               <div className="text-xs font-medium mb-0.5">
                                 Drying Entries ({stage.dryingEntries.length}):
-                              </div>{" "}
-                              {/* Use div */}
+                              </div>
                               <div className="border rounded-md max-h-32 overflow-y-auto">
                                 <Table className="text-xs">
                                   <TableHeader className="sticky top-0 bg-muted/50 z-10">
@@ -431,7 +433,7 @@ export function BatchDetailsDialog({
                             stage.status === "IN_PROGRESS" && (
                               <div className="text-xs text-muted-foreground mt-1 text-center py-1.5">
                                 No drying entries for this stage.
-                              </div> // Use div
+                              </div>
                             )}
 
                           {stage.sales?.length > 0 && (
@@ -439,8 +441,7 @@ export function BatchDetailsDialog({
                               <div className="text-xs font-medium mb-0.5">
                                 Sales from P{stage.processingCount} (
                                 {stage.sales.length}):
-                              </div>{" "}
-                              {/* Use div */}
+                              </div>
                               <div className="border rounded-md max-h-28 overflow-y-auto">
                                 <Table className="text-xs">
                                   <TableHeader className="sticky top-0 bg-muted/50 z-10">
@@ -475,7 +476,7 @@ export function BatchDetailsDialog({
                   ) : (
                     <div className="text-sm text-muted-foreground mt-2 text-center py-3">
                       No processing stages recorded yet.
-                    </div> // Use div
+                    </div>
                   )}
                 </div>
 
@@ -517,7 +518,7 @@ export function BatchDetailsDialog({
                   ) : (
                     <div className="text-sm text-muted-foreground mt-2 text-center py-3">
                       No sales recorded for this batch yet.
-                    </div> // Use div
+                    </div>
                   )}
                 </div>
               </div>

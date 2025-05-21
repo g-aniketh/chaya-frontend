@@ -2,9 +2,20 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.PROD_BACKEND_URL || "http://localhost:5000";
+const getBackendUrl = (path: string): string => {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+  ).replace(/\/$/, "");
+  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+};
 
-export async function POST(request: NextRequest, context: any) {
+interface Context {
+  params: {
+    stageId: string;
+  };
+}
+
+export async function POST(request: NextRequest, context: Context) {
   const { stageId } = context.params;
   try {
     const cookieStore = await cookies();
@@ -18,7 +29,7 @@ export async function POST(request: NextRequest, context: any) {
 
     const body = await request.json();
     const response = await fetch(
-      `${BACKEND_URL}api/processing-stages/${stageId}/drying`,
+      getBackendUrl(`/api/processing-stages/${stageId}/drying`),
       {
         method: "POST",
         headers: {
@@ -29,24 +40,29 @@ export async function POST(request: NextRequest, context: any) {
       }
     );
 
+    const responseData = await response.json().catch(() => null);
+
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText =
+        responseData?.error ||
+        (await response.text().catch(() => "Unknown backend error"));
       console.error(
-        `Backend error for /api/processing-stages/${stageId}/drying: ${response.status} - ${errorText}`
+        `Backend error for /api/processing-stages/${stageId}/drying: ${response.status} - ${errorText}`,
+        responseData?.details
       );
       return new NextResponse(
         JSON.stringify({
-          error: `Backend error: ${response.statusText}`,
-          details: errorText,
+          error: responseData?.error || `Backend error: ${response.statusText}`,
+          details: responseData?.details || errorText,
         }),
         {
           status: response.status,
         }
       );
     }
-
-    const data = await response.json();
-    return new NextResponse(JSON.stringify(data), { status: response.status });
+    return new NextResponse(JSON.stringify(responseData), {
+      status: response.status,
+    });
   } catch (error: unknown) {
     console.error(
       `Error in Next.js POST /api/processing-stages/${stageId}/drying:`,

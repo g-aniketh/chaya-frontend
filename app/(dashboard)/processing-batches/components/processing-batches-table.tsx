@@ -47,10 +47,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import axios, { AxiosError } from "axios";
 
-// Import Dialogs
-import { BatchDetailsDialog } from "./dialogs/batch-details-dialog"; // Ensure this is correctly imported
+import { BatchDetailsDialog } from "./dialogs/batch-details-dialog";
 import { AddDryingDialog } from "./dialogs/add-drying-dialog";
 import { FinalizeStageDialog } from "./dialogs/finalize-stage-dialog";
 import { StartNextStageDialog } from "./dialogs/start-next-stage-dialog";
@@ -89,17 +87,15 @@ export default function ProcessingBatchesTable({
   const [columnVisibility, setColumnVisibility] = useState(() => {
     const initialVisibility: Record<string, boolean> = {};
     defaultVisibleBatchColumns.forEach((colId) => {
-      // Use imported default columns
       initialVisibility[colId] = true;
     });
-    // Ensure all columns from batchColumns are in visibility state
     batchColumns.forEach((col) => {
       if (
         col.id &&
         initialVisibility[col.id] === undefined &&
         col.enableHiding !== false
       ) {
-        initialVisibility[col.id] = true; // Default to visible if not in defaultVisible and hideable
+        initialVisibility[col.id] = true;
       }
     });
     return initialVisibility;
@@ -107,7 +103,7 @@ export default function ProcessingBatchesTable({
 
   const [selectedBatchForAction, setSelectedBatchForAction] =
     useState<ProcessingBatchWithSummary | null>(null);
-  const [showDetailsDialog, setShowDetailsDialog] = useState(false); // This controls the BatchDetailsDialog
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showAddDryingDialog, setShowAddDryingDialog] = useState(false);
   const [showFinalizeStageDialog, setShowFinalizeStageDialog] = useState(false);
   const [showStartNextStageDialog, setShowStartNextStageDialog] =
@@ -148,9 +144,6 @@ export default function ProcessingBatchesTable({
       setRecords(freshData);
       toast.success("Data refreshed successfully");
       if (selectedBatchForAction) {
-        // When refreshing, if a detail dialog *might* be open for this batch,
-        // its data could be stale. Clearing its specific cache forces a re-fetch
-        // if the dialog is opened again or if it re-fetches on open.
         clearBatchDetailCache(selectedBatchForAction.id);
       }
     } catch (error) {
@@ -169,7 +162,7 @@ export default function ProcessingBatchesTable({
     query,
     statusFilter,
     refreshCurrentPageSummary,
-    selectedBatchForAction, // Dependency for clearBatchDetailCache
+    selectedBatchForAction,
     clearBatchDetailCache,
   ]);
 
@@ -179,7 +172,6 @@ export default function ProcessingBatchesTable({
 
   useEffect(() => {
     const handleDataChange = () => handleRefresh();
-    // Listen to this event which should be dispatched after ANY CUD operation on batches/stages/sales
     document.addEventListener("processingBatchDataChanged", handleDataChange);
     return () =>
       document.removeEventListener(
@@ -203,9 +195,9 @@ export default function ProcessingBatchesTable({
 
   const openDialog = (
     dialogSetter: React.Dispatch<React.SetStateAction<boolean>>,
-    batch: ProcessingBatchWithSummary // This is correct for table rows
+    batch: ProcessingBatchWithSummary
   ) => {
-    setSelectedBatchForAction(batch); // Keep this for other dialogs and delete
+    setSelectedBatchForAction(batch);
     dialogSetter(true);
   };
 
@@ -213,26 +205,31 @@ export default function ProcessingBatchesTable({
     if (!selectedBatchForAction) return;
     setIsDeleting(true);
     try {
-      await axios.delete(
+      const response = await fetch(
         `/api/processing-batches/${selectedBatchForAction.id}`,
-        { withCredentials: true }
+        {
+          method: "DELETE",
+        }
       );
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to parse error from server" }));
+        throw new Error(
+          errorData.error ||
+            `Failed to delete batch. Status: ${response.status}`
+        );
+      }
+
       toast.success(`Batch ${selectedBatchForAction.batchCode} deleted.`);
       setShowDeleteBatchDialog(false);
       handleRefresh();
-      // After deletion, the specific batch detail cache (if any) is no longer relevant.
-      // It will naturally be gone if `handleRefresh` leads to its ID not being in the list.
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.error ||
-            error.message ||
-            "Failed to delete batch."
-        );
-      } else if (error instanceof Error) {
+      if (error instanceof Error) {
         toast.error(`Failed to delete batch: ${error.message}`);
       } else {
-        toast.error("Failed to delete batch.");
+        toast.error("Failed to delete batch an unknown error occurred.");
       }
     } finally {
       setIsDeleting(false);
@@ -336,9 +333,8 @@ export default function ProcessingBatchesTable({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
-                const batchSummary = row.original; // Type is ProcessingBatchWithSummary
+                const batchSummary = row.original;
                 const latestStage = batchSummary.latestStageSummary;
-                // Ensure canPerformStageActions correctly checks for non-terminal statuses for stage-specific actions
                 const canPerformStageActions =
                   latestStage &&
                   latestStage.status !== "SOLD_OUT" &&
@@ -358,20 +354,18 @@ export default function ProcessingBatchesTable({
                       </TableCell>
                     ))}
                     <TableCell className="sticky right-0 bg-background z-0 flex items-center justify-center gap-1 py-1.5">
-                      {/* Pass batchSummary.id to BatchDetailsDialog */}
                       <Button
                         variant="ghost"
-                        size="icon" // Make it an icon button for consistency
+                        size="icon"
                         onClick={() => {
-                          setSelectedBatchForAction(batchSummary); // Keep this for delete/other actions
-                          setShowDetailsDialog(true); // This specific state controls BatchDetailsDialog
+                          setSelectedBatchForAction(batchSummary);
+                          setShowDetailsDialog(true);
                         }}
                         title="View Details"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
 
-                      {/* Action buttons logic */}
                       {canPerformStageActions &&
                         latestStage.status === "IN_PROGRESS" && (
                           <>
@@ -468,7 +462,6 @@ export default function ProcessingBatchesTable({
         </Table>
       </ScrollArea>
 
-      {/* Batch Details Dialog uses selectedBatchForAction.id if selectedBatchForAction is not null */}
       {selectedBatchForAction && showDetailsDialog && (
         <BatchDetailsDialog
           batchId={selectedBatchForAction.id}
@@ -477,7 +470,6 @@ export default function ProcessingBatchesTable({
         />
       )}
 
-      {/* Other Action Dialogs */}
       {selectedBatchForAction &&
         selectedBatchForAction.latestStageSummary &&
         showAddDryingDialog && (
@@ -486,6 +478,9 @@ export default function ProcessingBatchesTable({
             batchCode={selectedBatchForAction.batchCode}
             processingCount={
               selectedBatchForAction.latestStageSummary.processingCount
+            }
+            stageInitialQuantity={
+              selectedBatchForAction.latestStageSummary.initialQuantity
             }
             open={showAddDryingDialog}
             onOpenChange={setShowAddDryingDialog}
@@ -520,7 +515,7 @@ export default function ProcessingBatchesTable({
             previousProcessingCount={
               selectedBatchForAction.latestStageSummary.processingCount
             }
-            previousStageYield={selectedBatchForAction.netAvailableQuantity} // Correctly uses net from this stage
+            previousStageYield={selectedBatchForAction.netAvailableQuantity}
             open={showStartNextStageDialog}
             onOpenChange={setShowStartNextStageDialog}
             onSuccess={handleRefresh}
@@ -538,12 +533,12 @@ export default function ProcessingBatchesTable({
                 selectedBatchForAction.latestStageSummary.processingCount,
               quantityAfterProcess:
                 selectedBatchForAction.latestStageSummary.quantityAfterProcess,
-              status: selectedBatchForAction.latestStageSummary.status, // Pass the dynamic status
+              status: selectedBatchForAction.latestStageSummary.status,
             }}
             batchCode={selectedBatchForAction.batchCode}
             availableForSaleFromStage={
               selectedBatchForAction.netAvailableQuantity
-            } // net available from this finished stage
+            }
             open={showRecordSaleDialog}
             onOpenChange={setShowRecordSaleDialog}
             onSuccess={handleRefresh}

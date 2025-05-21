@@ -61,7 +61,7 @@ export function FarmerForm({
       if (mode === "add") {
         console.log("Doing a POST request to add a new farmer");
         const response = await axios.post(
-          `${apiBaseUrl}/api/farmers`,
+          `${apiBaseUrl}api/farmers`,
           data,
           axiosConfig
         );
@@ -70,7 +70,7 @@ export function FarmerForm({
       } else {
         console.log("Doing a PUT request to update farmer", farmerId);
         const response = await axios.put(
-          `${apiBaseUrl}/api/farmers/${farmerId}`,
+          `${apiBaseUrl}api/farmers/${farmerId}`,
           data,
           axiosConfig
         );

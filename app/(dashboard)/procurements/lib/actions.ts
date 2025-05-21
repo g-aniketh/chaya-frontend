@@ -27,7 +27,7 @@ export async function getProcurements({
       throw new Error("Authentication token not found");
     }
 
-    const response = await axios.get(`${API_URL}/api/procurements`, {
+    const response = await axios.get(`${API_URL}api/procurements`, {
       headers: {
         Cookie: `token=${token}`,
       },
@@ -66,7 +66,7 @@ export async function getProcurementPages(query = "") {
       throw new Error("Authentication token not found");
     }
 
-    const response = await axios.get(`${API_URL}/api/procurements`, {
+    const response = await axios.get(`${API_URL}api/procurements`, {
       headers: {
         Cookie: `token=${token}`,
       },
@@ -107,7 +107,7 @@ export async function bulkDeleteProcurements(ids: number[]) {
       return { success: false, error: "Authentication token not found" };
     }
 
-    const response = await fetch(`${API_URL}/api/procurements/bulk`, {
+    const response = await fetch(`${API_URL}api/procurements/bulk`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -147,7 +147,7 @@ export async function deleteProcurementAction(id: number) {
       return { success: false, error: "Authentication token not found" };
     }
 
-    const response = await fetch(`${API_URL}/api/procurements/${id}`, {
+    const response = await fetch(`${API_URL}api/procurements/${id}`, {
       method: "DELETE",
       headers: {
         Cookie: `token=${token}`,
@@ -186,7 +186,7 @@ export async function getUnbatchedProcurementsAction(params?: {
     if (params?.lotNo) queryParams.set("lotNo", params.lotNo);
 
     const response = await fetch(
-      `${API_URL}/api/procurements/unbatched?${queryParams.toString()}`,
+      `${API_URL}api/procurements/unbatched?${queryParams.toString()}`,
       {
         method: "GET",
         headers: { Cookie: `token=${token}` },
@@ -229,7 +229,7 @@ export async function updateProcurementAction(
     }
 
     const response = await fetch(
-      `${API_URL}/api/procurements/${procurementId}`,
+      `${API_URL}api/procurements/${procurementId}`,
       {
         method: "PUT",
         headers: {

@@ -10,4 +10,4 @@ jobs:
 
     steps:
       - name: Curl your endpoint
-        run: curl -fsSL https://chaya-backend-y6ne.onrender.com/api/health
+        run: curl -fsSL https://backend-chaya.onrender.com/api/health

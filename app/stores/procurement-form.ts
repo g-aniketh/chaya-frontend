@@ -32,7 +32,7 @@ const detailsSchemaForStore = z.object({
     .min(1)
     .max(3, "Only 1, 2, 3 Lot Numbers are allowed"),
   procuredBy: z.string().min(1, "Procured by is required"),
-  vehicleNo: z.string().min(1, "Vehicle number is required").optional(),
+  vehicleNo: z.string().min(1, "Vehicle number is required"),
 });
 
 export const procurementFullFormSchema = basicInfoSchemaForStore.merge(
@@ -42,7 +42,6 @@ export type ProcurementFullFormValues = z.infer<
   typeof procurementFullFormSchema
 >;
 
-// EXPORT TabType
 export type TabType = "basic" | "details" | "review";
 
 interface ProcurementFormState {

@@ -85,7 +85,7 @@ export function SelectCriteriaStep() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Step 1: Select Initial Criteria (Optional)</CardTitle>
+        <CardTitle>Step 1: Select Initial Criteria</CardTitle>
         <CardDescription>
           Specify Crop and/or Lot Number to pre-filter procurements. If both are
           left blank, youll define criteria based on your first procurement
@@ -101,18 +101,18 @@ export function SelectCriteriaStep() {
               name="crop"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="crop">Crop Name (Optional)</Label>
+                  <Label htmlFor="crop">Crop Name</Label>
                   <Select
                     onValueChange={(value) =>
                       field.onChange(
                         value === "NONE_SELECTED_VALUE" ? null : value
                       )
                     }
-                    value={field.value || undefined} // Pass undefined for placeholder
+                    value={field.value || undefined}
                   >
                     <FormControl>
                       <SelectTrigger id="crop">
-                        <SelectValue placeholder="Select a crop (optional)" />
+                        <SelectValue placeholder="Select a crop" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -124,10 +124,6 @@ export function SelectCriteriaStep() {
                     </SelectContent>
                   </Select>
                   <FormMessage />
-                  {/* The refine error (if path is "crop") will show via FormMessage if crop field itself also has an error.
-                      If only refine fails, FormMessage for crop might not show it if crop field input is valid on its own.
-                      The parent page's toast error for this step is a more reliable way to show the refine error.
-                  */}
                 </FormItem>
               )}
             />
@@ -136,12 +132,12 @@ export function SelectCriteriaStep() {
               name="lotNo"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="lotNo">Lot Number (Optional)</Label>
+                  <Label htmlFor="lotNo">Lot Number</Label>
                   <FormControl>
                     <Input
                       id="lotNo"
                       type="number"
-                      placeholder="Enter lot number (optional)"
+                      placeholder="Enter lot number"
                       value={
                         field.value === null || field.value === undefined
                           ? ""
@@ -163,17 +159,12 @@ export function SelectCriteriaStep() {
                 </FormItem>
               )}
             />
-            {/* Displaying the refine error specifically if it's attached to form.formState.errors.crop
-                and there's no other message from the field's own validators.
-                This logic can be tricky. The toast in the parent is often clearer for overall step validation.
-            */}
             {form.formState.errors.crop &&
-              form.formState.errors.crop.type === "manual" && ( // refine errors often appear as 'manual'
+              form.formState.errors.crop.type === "manual" && (
                 <p className="text-sm text-red-500 mt-1">
                   {form.formState.errors.crop.message}
                 </p>
               )}
-            {/* Or more generally, if the refine error is the *only* error for crop: */}
             {form.formState.errors.crop &&
               Object.keys(form.formState.errors.crop).length === 1 &&
               form.formState.errors.crop.message && (

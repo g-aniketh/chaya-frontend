@@ -155,7 +155,7 @@ export function DetailsSection() {
           </div>
 
           <div>
-            <Label htmlFor="vehicleNo">Vehicle Number (Optional)</Label>
+            <Label htmlFor="vehicleNo">Vehicle Number</Label>
             <Input id="vehicleNo" {...formRegister("vehicleNo")} />
             {errors.vehicleNo && (
               <p className="text-sm text-red-500 mt-1">

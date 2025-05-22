@@ -48,7 +48,7 @@ export function ReviewAndSubmitStep() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold">Batch Criteria (Locked)</h3>
+          <h3 className="text-lg font-semibold">Batch Criteria</h3>
           <Separator className="my-2" />
           <div className="grid grid-cols-2 gap-2">
             <p className="font-medium">Crop:</p>

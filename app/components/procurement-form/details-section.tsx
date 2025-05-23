@@ -23,6 +23,12 @@ import { CalendarIcon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProcurementFullFormValues } from "@/app/stores/procurement-form";
 
+const lotNoDisplayMapping: { [key: number]: string } = {
+  1: "1 (High Quality)",
+  2: "2 (Moderate Quality)",
+  3: "3 (Low Quality)",
+};
+
 export function DetailsSection() {
   const {
     control,
@@ -130,7 +136,7 @@ export function DetailsSection() {
                   <SelectContent>
                     {[1, 2, 3].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
-                        {num}
+                        {lotNoDisplayMapping[num]}{" "}
                       </SelectItem>
                     ))}
                   </SelectContent>

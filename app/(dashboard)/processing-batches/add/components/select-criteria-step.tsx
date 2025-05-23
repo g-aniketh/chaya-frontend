@@ -137,7 +137,7 @@ export function SelectCriteriaStep() {
                     <Input
                       id="lotNo"
                       type="number"
-                      placeholder="Enter lot number"
+                      placeholder="Enter lot number (1, 2, or 3)"
                       value={
                         field.value === null || field.value === undefined
                           ? ""
@@ -145,13 +145,12 @@ export function SelectCriteriaStep() {
                       }
                       onChange={(e) => {
                         const val = e.target.value;
-                        field.onChange(
-                          val === ""
-                            ? null
-                            : isNaN(parseInt(val, 4))
-                              ? null
-                              : parseInt(val, 4)
-                        );
+                        if (val === "") {
+                          field.onChange(null);
+                        } else {
+                          const num = parseInt(val, 10);
+                          field.onChange(isNaN(num) ? null : num);
+                        }
                       }}
                     />
                   </FormControl>

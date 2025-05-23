@@ -366,22 +366,18 @@ export function AddDryingDialog({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {existingDryingEntries.map(
-                    (
-                      entry // Should already be sorted by day 'asc' from action
-                    ) => (
-                      <TableRow key={entry.id}>
-                        <TableCell>{entry.day}</TableCell>
-                        <TableCell>{entry.temperature}°C</TableCell>
-                        <TableCell>{entry.humidity}%</TableCell>
-                        <TableCell>{entry.pH}</TableCell>
-                        <TableCell>{entry.moisturePercentage}%</TableCell>
-                        <TableCell className="text-right">
-                          {entry.currentQuantity.toFixed(2)}kg
-                        </TableCell>
-                      </TableRow>
-                    )
-                  )}
+                  {existingDryingEntries.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell>{entry.day}</TableCell>
+                      <TableCell>{entry.temperature}°C</TableCell>
+                      <TableCell>{entry.humidity}%</TableCell>
+                      <TableCell>{entry.pH}</TableCell>
+                      <TableCell>{entry.moisturePercentage}%</TableCell>
+                      <TableCell className="text-right">
+                        {entry.currentQuantity.toFixed(2)}kg
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </ScrollArea>

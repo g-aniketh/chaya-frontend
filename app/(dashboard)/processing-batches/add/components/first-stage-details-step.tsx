@@ -115,7 +115,7 @@ export function FirstStageDetailsStep() {
                   <Label htmlFor="processMethod">Process Method</Label>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value || ""}
                   >
                     <FormControl>
                       <SelectTrigger id="processMethod">

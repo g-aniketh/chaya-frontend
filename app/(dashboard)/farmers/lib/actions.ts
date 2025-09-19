@@ -3,9 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { Gender, Relationship } from "@ankeny/chaya-prisma-package/client";
 import { ITEMS_PER_PAGE } from "./constants";
-import { PrismaClient } from "@prisma/client";
+import { cookies } from "next/headers";
 
-const prisma = new PrismaClient();
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
+// Helper function to get auth token from cookies
+async function getAuthToken() {
+  const cookieStore = await cookies();
+  return cookieStore.get("token")?.value;
+}
 interface FarmerFormData {
   surveyNumber: string;
   name: string;
@@ -45,32 +51,34 @@ interface FarmerFormData {
 
 export async function createFarmer(userId: number, formData: FarmerFormData) {
   try {
+    const token = await getAuthToken();
+    if (!token) {
+      return { error: "Authentication required" };
+    }
+
     const { bankDetails, documents, fields, ...farmerData } = formData;
     const dateOfBirth = new Date(farmerData.dateOfBirth);
 
-    await prisma.farmer.create({
-      data: {
+    const response = await fetch(`${API_BASE_URL}/api/farmers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
         ...farmerData,
-        dateOfBirth,
+        dateOfBirth: dateOfBirth.toISOString(),
         createdById: userId,
         updatedById: userId,
-        ...(bankDetails && {
-          bankDetails: {
-            create: bankDetails,
-          },
-        }),
-        ...(documents && {
-          documents: {
-            create: documents,
-          },
-        }),
-        ...(fields && {
-          fields: {
-            create: fields,
-          },
-        }),
-      },
+        bankDetails,
+        documents,
+        fields,
+      }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     revalidatePath("/dashboard/farmers");
     return { success: true };
@@ -86,41 +94,35 @@ export async function updateFarmer(
   formData: Partial<FarmerFormData>
 ) {
   try {
+    const token = await getAuthToken();
+    if (!token) {
+      return { error: "Authentication required" };
+    }
+
     const { bankDetails, documents, fields, ...farmerData } = formData;
     const dateOfBirth = farmerData.dateOfBirth
-      ? new Date(farmerData.dateOfBirth)
+      ? new Date(farmerData.dateOfBirth).toISOString()
       : undefined;
 
-    await prisma.farmer.update({
-      where: { id: farmerId },
-      data: {
+    const response = await fetch(`${API_BASE_URL}/api/farmers/${farmerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
         ...farmerData,
         ...(dateOfBirth && { dateOfBirth }),
         updatedById: userId,
-        ...(bankDetails && {
-          bankDetails: {
-            upsert: {
-              create: bankDetails,
-              update: bankDetails,
-            },
-          },
-        }),
-        ...(documents && {
-          documents: {
-            upsert: {
-              create: documents,
-              update: documents,
-            },
-          },
-        }),
-        ...(fields && {
-          fields: {
-            deleteMany: {},
-            create: fields,
-          },
-        }),
-      },
+        bankDetails,
+        documents,
+        fields,
+      }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     revalidatePath("/dashboard/farmers");
     return { success: true };
@@ -132,9 +134,21 @@ export async function updateFarmer(
 
 export async function deleteFarmer(farmerId: number) {
   try {
-    await prisma.farmer.delete({
-      where: { id: farmerId },
+    const token = await getAuthToken();
+    if (!token) {
+      return { error: "Authentication required" };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/farmers/${farmerId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     revalidatePath("/dashboard/farmers");
     return { success: true };
@@ -146,11 +160,23 @@ export async function deleteFarmer(farmerId: number) {
 
 export async function bulkDeleteFarmers(farmerIds: number[]) {
   try {
-    await prisma.farmer.deleteMany({
-      where: {
-        id: { in: farmerIds },
+    const token = await getAuthToken();
+    if (!token) {
+      return { error: "Authentication required" };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/farmers/bulk-delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
+      body: JSON.stringify({ farmerIds }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     revalidatePath("/dashboard/farmers");
     return { success: true };
@@ -162,25 +188,26 @@ export async function bulkDeleteFarmers(farmerIds: number[]) {
 
 export async function exportFarmersData(query?: string) {
   try {
-    const farmers = await prisma.farmer.findMany({
-      where: query
-        ? {
-            OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { aadharNumber: { contains: query, mode: "insensitive" } },
-              { surveyNumber: { contains: query, mode: "insensitive" } },
-            ],
-          }
-        : undefined,
-      include: {
-        bankDetails: true,
-        fields: true,
+    const token = await getAuthToken();
+    if (!token) {
+      return { error: "Authentication required" };
+    }
+
+    const queryParam = query ? `?query=${encodeURIComponent(query)}` : "";
+    const response = await fetch(`${API_BASE_URL}/api/farmers/export${queryParam}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
       },
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
     return {
       success: true,
-      count: farmers.length,
+      count: data.count,
       downloadUrl: `/api/export/farmers?timestamp=${Date.now()}`,
     };
   } catch (error) {
@@ -197,63 +224,63 @@ export async function getFarmers({
   page?: number;
   selectedColumns?: string[];
 }) {
-  const offset = (page - 1) * ITEMS_PER_PAGE;
-
   try {
-    const farmers = await prisma.farmer.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { aadharNumber: { contains: query, mode: "insensitive" } },
-          { surveyNumber: { contains: query, mode: "insensitive" } },
-          { contactNumber: { contains: query, mode: "insensitive" } },
-          { village: { contains: query, mode: "insensitive" } },
-          { district: { contains: query, mode: "insensitive" } },
-        ],
-      },
-      include: {
-        bankDetails: true,
-        documents: true,
-        fields: true,
-        createdBy: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      take: ITEMS_PER_PAGE,
-      skip: offset,
-      orderBy: {
-        createdAt: "desc",
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error("Authentication required");
+    }
+
+    const params = new URLSearchParams({
+      query,
+      page: page.toString(),
+      limit: ITEMS_PER_PAGE.toString(),
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/farmers?${params}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
       },
     });
 
-    return farmers;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.farmers || [];
   } catch (error) {
-    console.error("Database Error:", error);
+    console.error("API Error:", error);
     throw new Error("Failed to fetch farmers.");
   }
 }
 
 export async function getFarmerPages(query: string) {
   try {
-    const count = await prisma.farmer.count({
-      where: {
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { aadharNumber: { contains: query, mode: "insensitive" } },
-          { surveyNumber: { contains: query, mode: "insensitive" } },
-          { contactNumber: { contains: query, mode: "insensitive" } },
-          { village: { contains: query, mode: "insensitive" } },
-          { district: { contains: query, mode: "insensitive" } },
-        ],
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error("Authentication required");
+    }
+
+    const params = new URLSearchParams({
+      query,
+      count: "true",
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/farmers/count?${params}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
       },
     });
 
-    const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const totalPages = Math.ceil(data.count / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
-    console.error("Database Error:", error);
+    console.error("API Error:", error);
     throw new Error("Failed to fetch total number of farmers.");
   }
 }

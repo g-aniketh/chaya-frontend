@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Gender, Relationship } from "@ankeny/chaya-prisma-package";
+import { Gender, Relationship } from "@ankeny/chaya-prisma-package/client";
 import { ITEMS_PER_PAGE } from "./constants";
-import { prisma } from "@ankeny/chaya-prisma-package";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 interface FarmerFormData {
   surveyNumber: string;
   name: string;

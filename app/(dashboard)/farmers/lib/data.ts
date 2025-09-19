@@ -1,4 +1,6 @@
-import { prisma } from "@ankeny/chaya-prisma-package";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const ITEMS_PER_PAGE = 10;
 

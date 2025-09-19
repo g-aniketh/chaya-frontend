@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@ankeny/chaya-prisma-package':
-        specifier: ^1.0.5
-        version: 1.0.5(prisma@6.16.2(typescript@5.8.3))
+        specifier: ^1.0.13
+        version: 1.0.13(prisma@6.16.2(typescript@5.8.3))
       '@hookform/resolvers':
         specifier: ^5.0.1
         version: 5.0.1(react-hook-form@7.56.4(react@19.1.0))
@@ -218,8 +218,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@ankeny/chaya-prisma-package@1.0.5':
-    resolution: {integrity: sha512-1NznHZ2l5ymGRDKFnMEqN2VZjKzcX8gdpsPriQv+ty3pRfxFSgkk5K8odmAtg1wpwQh02nz/YyPEcwxAKhbPyA==}
+  '@ankeny/chaya-prisma-package@1.0.13':
+    resolution: {integrity: sha512-+gxP+nGyz8il7yM+WLsSGlkmJXY4+Il/Oh5Ozt8KQfzVwp8x5N4iPQoQAa0pQJpfQ727VDOJ2CaTG8rN6T6krQ==}
 
   '@babel/runtime@7.27.1':
     resolution: {integrity: sha512-1x3D2xEk2fRo3PAhwQwu5UubzgiVWSXTBfWpVd2Mx2AzRqJuDJCsgaDVZ7HB5iGzDW1Hl1sWN2mFyKjmR9uAog==}
@@ -3345,7 +3345,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@ankeny/chaya-prisma-package@1.0.5(prisma@6.16.2(typescript@5.8.3))':
+  '@ankeny/chaya-prisma-package@1.0.13(prisma@6.16.2(typescript@5.8.3))':
     dependencies:
       '@prisma/client': 6.16.2(prisma@6.16.2(typescript@5.8.3))(typescript@5.8.3)
       typescript: 5.8.3

@@ -7,7 +7,7 @@ import {
   createSaleFormSchema,
   type CreateSaleInput as BackendCreateSaleInputType,
   ProcessingStageStatus,
-} from "@ankeny/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package/client";
 // Removed unused type ProcessingStage, import ProcessingStageStatus instead
 // import type { ProcessingStage } from '@chaya/shared';
 

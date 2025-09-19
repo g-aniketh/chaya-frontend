@@ -7,7 +7,7 @@ import {
   createDryingEntrySchema,
   type CreateDryingEntryInput,
   type Drying,
-} from "@ankeny/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package/client";
 import {
   Dialog,
   DialogContent,
@@ -189,13 +189,17 @@ export function AddDryingDialog({
                         type="number"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseInt(e.target.value, 10)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid integer
+                          if (value === "" || /^\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseInt(value, 10)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -214,13 +218,17 @@ export function AddDryingDialog({
                         step="0.1"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseFloat(e.target.value)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid number
+                          if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseFloat(value)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -239,13 +247,17 @@ export function AddDryingDialog({
                         step="0.1"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseFloat(e.target.value)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid number
+                          if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseFloat(value)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -264,13 +276,17 @@ export function AddDryingDialog({
                         step="0.1"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseFloat(e.target.value)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid number
+                          if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseFloat(value)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -289,13 +305,17 @@ export function AddDryingDialog({
                         step="0.1"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseFloat(e.target.value)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid number
+                          if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseFloat(value)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -314,13 +334,17 @@ export function AddDryingDialog({
                         step="0.01"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : parseFloat(e.target.value)
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string or valid number
+                          if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                            field.onChange(
+                              value === ""
+                                ? undefined
+                                : parseFloat(value)
+                            );
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

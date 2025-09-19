@@ -74,9 +74,17 @@ export function FieldsSection() {
                           type="number"
                           placeholder="Enter area"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Allow empty string or valid number
+                            if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                              field.onChange(
+                                value === ""
+                                  ? undefined
+                                  : parseFloat(value)
+                              );
+                            }
+                          }}
                           value={field.value ?? ""}
                         />
                       </FormControl>
@@ -96,9 +104,17 @@ export function FieldsSection() {
                           type="number"
                           placeholder="Enter yield estimate"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Allow empty string or valid number
+                            if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                              field.onChange(
+                                value === ""
+                                  ? undefined
+                                  : parseFloat(value)
+                              );
+                            }
+                          }}
                           value={field.value || ""}
                         />
                       </FormControl>
@@ -128,9 +144,17 @@ export function FieldsSection() {
                               type="number"
                               placeholder="Enter latitude"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value) || 0)
-                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty string or valid number
+                                if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                                  field.onChange(
+                                    value === ""
+                                      ? undefined
+                                      : parseFloat(value)
+                                  );
+                                }
+                              }}
                               value={field.value || ""}
                             />
                           </FormControl>
@@ -150,9 +174,17 @@ export function FieldsSection() {
                               type="number"
                               placeholder="Enter longitude"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value) || 0)
-                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty string or valid number
+                                if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                                  field.onChange(
+                                    value === ""
+                                      ? undefined
+                                      : parseFloat(value)
+                                  );
+                                }
+                              }}
                               value={field.value || ""}
                             />
                           </FormControl>

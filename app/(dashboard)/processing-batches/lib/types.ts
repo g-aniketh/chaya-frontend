@@ -6,7 +6,7 @@ import type {
   Sale,
   User,
   ProcessingStageStatus as PrismaProcessingStageStatus,
-} from "@ankeny/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package/client";
 
 export type ExtendedProcessingStageStatus =
   | PrismaProcessingStageStatus

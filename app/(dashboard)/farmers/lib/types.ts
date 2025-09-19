@@ -4,7 +4,7 @@ import {
   FarmerDocuments,
   Field,
   User,
-} from "@ankeny/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package/client";
 
 export interface FarmerWithRelations extends Farmer {
   bankDetails?: BankDetails | null;

@@ -31,7 +31,7 @@ export function FarmerDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>Farmer Details: {farmer.name}</DialogTitle>
+          <DialogTitle>Farmer Details: {(farmer as any).name || 'Unknown'}</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="personal" className="mt-4">

@@ -9,7 +9,7 @@ import type {
 import type {
   Drying,
   FinalizeProcessingStageInput,
-} from "@fyzanshaik/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package";
 
 const getBackendUrl = (path: string): string => {
   const baseUrl = (

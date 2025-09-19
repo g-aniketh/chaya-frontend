@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FarmerWithRelations } from "../(dashboard)/farmers/lib/types";
-import { createFarmerSchema } from "@fyzanshaik/chaya-prisma-package";
+import { createFarmerSchema } from "@ankeny/chaya-prisma-package";
 import { useFarmerFormStore } from "../stores/farmer-form";
 
 interface FarmerFormProviderProps {

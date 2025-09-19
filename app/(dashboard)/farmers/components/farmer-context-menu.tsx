@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Farmer } from "@fyzanshaik/chaya-prisma-package";
+import { Farmer } from "@ankeny/chaya-prisma-package";
 import {
   ContextMenu,
   ContextMenuContent,

@@ -4,7 +4,7 @@ import type { UseFormReturn } from "react-hook-form";
 import type {
   Procurement as BaseProcurement,
   CreateProcessingBatchInput,
-} from "@fyzanshaik/chaya-prisma-package"; // Renamed to BaseProcurement
+} from "@ankeny/chaya-prisma-package"; // Renamed to BaseProcurement
 import { toast } from "sonner";
 
 // Define the procurement type as it's stored in this Zustand store

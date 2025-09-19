@@ -7,7 +7,7 @@ import {
   createDryingEntrySchema,
   type CreateDryingEntryInput,
   type Drying,
-} from "@fyzanshaik/chaya-prisma-package";
+} from "@ankeny/chaya-prisma-package";
 import {
   Dialog,
   DialogContent,

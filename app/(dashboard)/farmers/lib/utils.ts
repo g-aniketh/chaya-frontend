@@ -1,4 +1,4 @@
-import { Gender, Relationship } from "@fyzanshaik/chaya-prisma-package";
+import { Gender, Relationship } from "@ankeny/chaya-prisma-package";
 
 /**
  * Format a date object or string to a localized date string

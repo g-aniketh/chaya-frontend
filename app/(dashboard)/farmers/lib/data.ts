@@ -1,4 +1,4 @@
-import { prisma } from "@fyzanshaik/chaya-prisma-package";
+import { prisma } from "@ankeny/chaya-prisma-package";
 
 export const ITEMS_PER_PAGE = 10;
 

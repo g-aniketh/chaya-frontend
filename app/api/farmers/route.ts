@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const backendRes = await fetch(`${BACKEND_API_URL}api/farmers`, {
+    const backendRes = await fetch(getBackendUrl("farmers"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,22 +35,23 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const limit = searchParams.get("limit") ?? "1000";
-  const isActive = searchParams.get("isActive") ?? "true";
-
   try {
-    const backendRes = await fetch(
-      `${BACKEND_API_URL}api/farmers?limit=${limit}&isActive=${isActive}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: request.headers.get("cookie") ?? "",
-        },
-        credentials: "include",
-      }
-    );
+    const { searchParams } = new URL(request.url);
+    
+    // Forward all search parameters to the backend
+    const queryString = searchParams.toString();
+    const url = queryString 
+      ? `${getBackendUrl("farmers")}?${queryString}`
+      : getBackendUrl("farmers");
+
+    const backendRes = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: request.headers.get("cookie") ?? "",
+      },
+      credentials: "include",
+    });
 
     const data = await backendRes.json();
 

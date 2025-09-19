@@ -4,14 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Gender, Relationship } from "@ankeny/chaya-prisma-package/client";
 import { ITEMS_PER_PAGE } from "./constants";
 import { cookies } from "next/headers";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-
-// Helper function to get auth token from cookies
-async function getAuthToken() {
-  const cookieStore = await cookies();
-  return cookieStore.get("token")?.value;
-}
+import { getApiUrl } from "@/lib/utils/api";
 interface FarmerFormData {
   surveyNumber: string;
   name: string;
@@ -51,20 +44,19 @@ interface FarmerFormData {
 
 export async function createFarmer(userId: number, formData: FarmerFormData) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      return { error: "Authentication required" };
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     const { bankDetails, documents, fields, ...farmerData } = formData;
     const dateOfBirth = new Date(farmerData.dateOfBirth);
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers`, {
+    const response = await fetch(getApiUrl("farmers"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Cookie": cookieHeader,
       },
+      credentials: "include",
       body: JSON.stringify({
         ...farmerData,
         dateOfBirth: dateOfBirth.toISOString(),
@@ -94,21 +86,19 @@ export async function updateFarmer(
   formData: Partial<FarmerFormData>
 ) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      return { error: "Authentication required" };
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     const { bankDetails, documents, fields, ...farmerData } = formData;
     const dateOfBirth = farmerData.dateOfBirth
       ? new Date(farmerData.dateOfBirth).toISOString()
       : undefined;
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers/${farmerId}`, {
+    const response = await fetch(getApiUrl(`farmers/${farmerId}`), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Cookie": cookieHeader,
       },
       body: JSON.stringify({
         ...farmerData,
@@ -134,16 +124,16 @@ export async function updateFarmer(
 
 export async function deleteFarmer(farmerId: number) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      return { error: "Authentication required" };
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers/${farmerId}`, {
+    const response = await fetch(getApiUrl(`farmers/${farmerId}`), {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader,
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -160,16 +150,14 @@ export async function deleteFarmer(farmerId: number) {
 
 export async function bulkDeleteFarmers(farmerIds: number[]) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      return { error: "Authentication required" };
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers/bulk-delete`, {
+    const response = await fetch(getApiUrl("farmers/bulk-delete"), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        "Cookie": cookieHeader,
       },
       body: JSON.stringify({ farmerIds }),
     });
@@ -188,16 +176,16 @@ export async function bulkDeleteFarmers(farmerIds: number[]) {
 
 export async function exportFarmersData(query?: string) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      return { error: "Authentication required" };
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     const queryParam = query ? `?query=${encodeURIComponent(query)}` : "";
-    const response = await fetch(`${API_BASE_URL}/api/farmers/export${queryParam}`, {
+    const response = await fetch(getApiUrl(`farmers/export${queryParam}`), {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader,
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -225,10 +213,8 @@ export async function getFarmers({
   selectedColumns?: string[];
 }) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      throw new Error("Authentication required");
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
       query,
@@ -236,10 +222,12 @@ export async function getFarmers({
       limit: ITEMS_PER_PAGE.toString(),
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers?${params}`, {
+    const response = await fetch(getApiUrl(`farmers?${params}`), {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader,
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -256,20 +244,20 @@ export async function getFarmers({
 
 export async function getFarmerPages(query: string) {
   try {
-    const token = await getAuthToken();
-    if (!token) {
-      throw new Error("Authentication required");
-    }
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
       query,
       count: "true",
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/farmers/count?${params}`, {
+    const response = await fetch(getApiUrl(`farmers/count?${params}`), {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader,
       },
+      credentials: "include",
     });
 
     if (!response.ok) {

@@ -1,13 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/";
-
-if (!BACKEND_API_URL) {
-  console.error(
-    "NEXT_PUBLIC_BACKEND_URL is not defined in environment variables"
-  );
-}
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function POST(request: NextRequest) {
   let email, password;
@@ -32,7 +24,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const backendResponse = await fetch(`${BACKEND_API_URL}api/auth/login`, {
+    const backendResponse = await fetch(getBackendUrl("auth/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

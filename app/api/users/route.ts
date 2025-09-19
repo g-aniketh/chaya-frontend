@@ -1,7 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -13,15 +11,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!BACKEND_API_URL) {
-    return NextResponse.json(
-      { message: "Backend service URL not configured" },
-      { status: 500 }
-    );
-  }
 
   try {
-    const backendResponse = await fetch(`${BACKEND_API_URL}api/users`, {
+    const backendResponse = await fetch(getBackendUrl("users"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

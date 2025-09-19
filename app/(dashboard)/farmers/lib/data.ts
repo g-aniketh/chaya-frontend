@@ -19,7 +19,7 @@ export async function getFarmers({
     const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
-      query,
+      search: query,
       page: page.toString(),
       limit: ITEMS_PER_PAGE.toString(),
     });
@@ -51,8 +51,7 @@ export async function getFarmerPages(query: string) {
     const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
-      query,
-      count: "true",
+      search: query,
     });
 
     const response = await fetch(`${getApiUrl(`farmers/count?${params}`)}`, {

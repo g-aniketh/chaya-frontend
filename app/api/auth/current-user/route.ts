@@ -1,7 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -14,7 +12,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const backendResponse = await fetch(`${BACKEND_API_URL}api/auth/me`, {
+    const backendResponse = await fetch(getBackendUrl("auth/me"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

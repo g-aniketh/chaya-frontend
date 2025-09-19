@@ -25,7 +25,7 @@ import { useAuth } from "@/app/providers/auth-provider";
 import { FarmerContextMenu } from "./farmer-context-menu";
 import { FarmerDetailsDialog } from "./farmer-details-dialog";
 import { FarmerFormDialog } from "./farmer-form-dialog";
-import { bulkDeleteFarmers } from "../lib/actions";
+import { FarmersApiService } from "@/lib/services/farmers-api";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, TrashIcon } from "lucide-react";
 import {
@@ -187,14 +187,9 @@ export default function FarmersTable({
         return;
       }
 
-      const result = await bulkDeleteFarmers(selectedFarmerIds);
-
-      if (result.success) {
-        toast.success("Farmers deleted successfully.");
-        await handleRefresh();
-      } else {
-        toast.error("Failed to delete farmers. Please try again.");
-      }
+      await FarmersApiService.bulkDeleteFarmers(selectedFarmerIds);
+      toast.success("Farmers deleted successfully.");
+      await handleRefresh();
 
       setShowBulkDeleteDialog(false);
     } catch (error) {

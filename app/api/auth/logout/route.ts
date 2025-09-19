@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -20,9 +19,9 @@ export async function POST(request: NextRequest) {
     path: "/",
   });
 
-  if (BACKEND_API_URL && token) {
+  if (token) {
     try {
-      await fetch(`${BACKEND_API_URL}api/auth/logout`, {
+      await fetch(getBackendUrl("auth/logout"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -34,10 +33,6 @@ export async function POST(request: NextRequest) {
         error instanceof Error ? error.message : "Unknown error";
       console.error("Error calling backend logout:", errorMessage);
     }
-  } else {
-    console.log(
-      "Skipping backend logout call: BACKEND_API_URL or token missing."
-    );
   }
 
   return response;

@@ -179,7 +179,7 @@ export async function exportFarmersData(query?: string) {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.toString();
 
-    const queryParam = query ? `?query=${encodeURIComponent(query)}` : "";
+    const queryParam = query ? `?search=${encodeURIComponent(query)}` : "";
     const response = await fetch(getApiUrl(`farmers/export${queryParam}`), {
       headers: {
         "Content-Type": "application/json",
@@ -217,7 +217,7 @@ export async function getFarmers({
     const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
-      query,
+      search: query,
       page: page.toString(),
       limit: ITEMS_PER_PAGE.toString(),
     });
@@ -248,8 +248,7 @@ export async function getFarmerPages(query: string) {
     const cookieHeader = cookieStore.toString();
 
     const params = new URLSearchParams({
-      query,
-      count: "true",
+      search: query,
     });
 
     const response = await fetch(getApiUrl(`farmers/count?${params}`), {

@@ -1,7 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function DELETE(
   request: NextRequest,
@@ -17,15 +15,9 @@ export async function DELETE(
     );
   }
 
-  if (!BACKEND_API_URL) {
-    return NextResponse.json(
-      { message: "Backend service URL not configured" },
-      { status: 500 }
-    );
-  }
 
   try {
-    const backendResponse = await fetch(`${BACKEND_API_URL}api/users/${id}`, {
+    const backendResponse = await fetch(getBackendUrl(`users/${id}`), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -66,16 +58,10 @@ export async function PUT(
     );
   }
 
-  if (!BACKEND_API_URL) {
-    return NextResponse.json(
-      { message: "Backend service URL not configured" },
-      { status: 500 }
-    );
-  }
 
   try {
     const body = await request.json();
-    const backendResponse = await fetch(`${BACKEND_API_URL}api/users/${id}`, {
+    const backendResponse = await fetch(getBackendUrl(`users/${id}`), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

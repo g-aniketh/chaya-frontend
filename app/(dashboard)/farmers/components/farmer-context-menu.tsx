@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import { deleteFarmer } from "../lib/actions";
+import { FarmersApiService } from "@/lib/services/farmers-api";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -43,20 +43,14 @@ export function FarmerContextMenu({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const result = await deleteFarmer(farmer.id);
+      await FarmersApiService.deleteFarmer(farmer.id);
+      
+      toast.success("Farmer deleted", {
+        description: `${farmer.name} has been successfully deleted.`,
+      });
 
-      if (result.success) {
-        toast.success("Farmer deleted", {
-          description: `${farmer.name} has been successfully deleted.`,
-        });
-
-        const dataChangedEvent = new CustomEvent("farmerDataChanged");
-        document.dispatchEvent(dataChangedEvent);
-      } else {
-        toast.error("Error", {
-          description: result.error || "Failed to delete farmer.",
-        });
-      }
+      const dataChangedEvent = new CustomEvent("farmerDataChanged");
+      document.dispatchEvent(dataChangedEvent);
 
       setShowDeleteDialog(false);
     } catch (error) {

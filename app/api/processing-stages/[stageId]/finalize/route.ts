@@ -1,7 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000/";
+import { getBackendUrl } from "@/lib/utils/api";
 
 export async function PUT(
   request: NextRequest,
@@ -17,18 +15,12 @@ export async function PUT(
     );
   }
 
-  if (!BACKEND_API_URL) {
-    return NextResponse.json(
-      { message: "Backend service URL not configured" },
-      { status: 500 }
-    );
-  }
 
   try {
     const body = await request.json();
 
     const backendResponse = await fetch(
-      `${BACKEND_API_URL}api/processing-stages/${stageId}/finalize`,
+      getBackendUrl(`processing-stages/${stageId}/finalize`),
       {
         method: "PUT",
         headers: {

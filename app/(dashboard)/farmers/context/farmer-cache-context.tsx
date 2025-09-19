@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { getFarmers, getFarmerPages } from "../lib/actions";
 import { FarmerWithRelations } from "../lib/types";
+import { FarmersApiService } from "@/lib/services/farmers-api";
 import { toast } from "sonner";
 
 interface FarmersCacheContextType {
@@ -52,10 +52,11 @@ export function FarmersCacheProvider({
 
       console.log(`Fetching page ${page}, query "${query}" from server`);
       try {
-        const data = (await getFarmers({
+        const data = await FarmersApiService.getFarmers({
           page,
-          query,
-        })) as FarmerWithRelations[];
+          search: query,
+          limit: 10,
+        });
         setFarmers((prev) => ({
           ...prev,
           [key]: data,
@@ -76,7 +77,8 @@ export function FarmersCacheProvider({
       }
 
       try {
-        const pages = await getFarmerPages(query);
+        const count = await FarmersApiService.getFarmerCount(query);
+        const pages = Math.ceil(count / 10);
         setTotalPages((prev) => ({
           ...prev,
           [query]: pages,
@@ -102,10 +104,11 @@ export function FarmersCacheProvider({
         if (farmers[key]) continue;
 
         try {
-          const data = (await getFarmers({
+          const data = await FarmersApiService.getFarmers({
             page,
-            query,
-          })) as FarmerWithRelations[];
+            search: query,
+            limit: 10,
+          });
           setFarmers((prev) => ({
             ...prev,
             [key]: data,
@@ -127,10 +130,11 @@ export function FarmersCacheProvider({
         `Force refreshing page ${page}, query "${query}" from server`
       );
       try {
-        const data = (await getFarmers({
+        const data = await FarmersApiService.getFarmers({
           page,
-          query,
-        })) as FarmerWithRelations[];
+          search: query,
+          limit: 10,
+        });
         setFarmers((prev) => ({
           ...prev,
           [key]: data,

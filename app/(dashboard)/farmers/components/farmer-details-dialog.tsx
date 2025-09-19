@@ -44,23 +44,23 @@ export function FarmerDetailsDialog({
           {/* Personal Information Tab */}
           <TabsContent value="personal" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem label="Survey Number" value={farmer.surveyNumber} />
-              <InfoItem label="Name" value={farmer.name} />
-              <InfoItem label="Gender" value={farmer.gender} />
-              <InfoItem label="Relationship" value={farmer.relationship} />
-              <InfoItem label="Community" value={farmer.community} />
-              <InfoItem label="Aadhar Number" value={farmer.aadharNumber} />
+              <InfoItem label="Survey Number" value={farmer.surveyNumber || 'N/A'} />
+              <InfoItem label="Name" value={farmer.name || 'N/A'} />
+              <InfoItem label="Gender" value={farmer.gender || 'N/A'} />
+              <InfoItem label="Relationship" value={farmer.relationship || 'N/A'} />
+              <InfoItem label="Community" value={farmer.community || 'N/A'} />
+              <InfoItem label="Aadhar Number" value={farmer.aadharNumber || 'N/A'} />
               <InfoItem
                 label="Date of Birth"
-                value={formatDate(farmer.dateOfBirth)}
+                value={farmer.dateOfBirth ? formatDate(farmer.dateOfBirth) : 'N/A'}
               />
-              <InfoItem label="Age" value={farmer.age.toString()} />
-              <InfoItem label="Contact Number" value={farmer.contactNumber} />
-              <InfoItem label="State" value={farmer.state} />
-              <InfoItem label="District" value={farmer.district} />
-              <InfoItem label="Mandal" value={farmer.mandal} />
-              <InfoItem label="Village" value={farmer.village} />
-              <InfoItem label="Panchayath" value={farmer.panchayath} />
+              <InfoItem label="Age" value={farmer.age ? farmer.age.toString() : 'N/A'} />
+              <InfoItem label="Contact Number" value={farmer.contactNumber || 'N/A'} />
+              <InfoItem label="State" value={farmer.state || 'N/A'} />
+              <InfoItem label="District" value={farmer.district || 'N/A'} />
+              <InfoItem label="Mandal" value={farmer.mandal || 'N/A'} />
+              <InfoItem label="Village" value={farmer.village || 'N/A'} />
+              <InfoItem label="Panchayath" value={farmer.panchayath || 'N/A'} />
             </div>
           </TabsContent>
 

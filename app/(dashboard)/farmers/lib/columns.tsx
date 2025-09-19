@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "./utils";
-import { Farmer } from "@ankeny/chaya-prisma-package/client";
+import { Farmer } from "./types";
 import { FileUser } from "lucide-react";
 
 export const columns: ColumnDef<Farmer>[] = [

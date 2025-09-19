@@ -2,13 +2,31 @@
 import { create } from "zustand";
 import type { UseFormReturn } from "react-hook-form";
 import type {
-  Procurement as BaseProcurement,
   CreateProcessingBatchInput,
-} from "@ankeny/chaya-prisma-package/client"; // Renamed to BaseProcurement
+} from "@ankeny/chaya-prisma-package/client";
 import { toast } from "sonner";
 
+// Define the procurement interface with all required properties
+export interface Procurement {
+  id: number;
+  farmerId: number;
+  crop: string;
+  procuredForm: string;
+  speciality: string;
+  quantity: number;
+  procurementNumber: string;
+  date: Date;
+  time: Date;
+  lotNo: number;
+  procuredBy: string;
+  vehicleNo?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  processingBatchId?: number | null;
+}
+
 // Define the procurement type as it's stored in this Zustand store
-export interface ProcurementWithFarmerForStore extends BaseProcurement {
+export interface ProcurementWithFarmerForStore extends Procurement {
   farmer: { name: string; village?: string }; // village is optional if not always present/needed
 }
 

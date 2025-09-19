@@ -363,7 +363,7 @@ export function BatchDetailsDialog({
                               </span>{" "}
                               {stage.initialQuantity.toFixed(2)}kg
                             </div>
-                            {stage.quantityAfterProcess !== null && (
+                            {stage.quantityAfterProcess != null && (
                               <div>
                                 <span className="text-muted-foreground">
                                   Stage Yield:

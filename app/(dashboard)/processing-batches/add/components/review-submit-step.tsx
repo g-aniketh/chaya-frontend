@@ -11,7 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useMemo } from "react";
 import { format } from "date-fns";
-import type { Procurement } from "@ankeny/chaya-prisma-package/client";
+import type { Procurement } from "@/app/stores/processing-batch-form";
 
 interface ProcurementWithFarmerForReview extends Procurement {
   farmer?: { name?: string };

@@ -1,12 +1,74 @@
 import type {
-  ProcessingBatch,
-  Procurement,
-  ProcessingStage,
-  Drying,
-  Sale,
-  User,
   ProcessingStageStatus as PrismaProcessingStageStatus,
 } from "@ankeny/chaya-prisma-package/client";
+import type { Farmer } from "../../farmers/lib/types";
+import type { Procurement } from "../../procurements/lib/types";
+
+// Define local interfaces based on Prisma schema
+export interface ProcessingBatch {
+  id: number;
+  batchCode: string;
+  crop: string;
+  lotNo: number;
+  initialBatchQuantity: number;
+  createdById: number;
+  createdAt: Date;
+  updatedAt: Date;
+  farmerId?: number | null;
+}
+
+export interface ProcessingStage {
+  id: number;
+  processingBatchId: number;
+  processingCount: number;
+  processMethod: string;
+  initialQuantity: number;
+  quantityAfterProcess?: number | null;
+  dateOfProcessing: Date;
+  dateOfCompletion?: Date | null;
+  doneBy: string;
+  status: PrismaProcessingStageStatus;
+  createdById: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Drying {
+  id: number;
+  processingStageId: number;
+  day: number;
+  temperature: number;
+  humidity: number;
+  pH: number;
+  moisturePercentage: number;
+  currentQuantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Sale {
+  id: number;
+  processingBatchId: number;
+  processingStageId: number;
+  quantitySold: number;
+  dateOfSale: Date;
+  createdById: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  password: string;
+  name: string;
+  role: string;
+  isActive: boolean;
+  isEnabled: boolean;
+  lastLoginAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export type ExtendedProcessingStageStatus =
   | PrismaProcessingStageStatus
